@@ -1,47 +1,52 @@
 ---
 title: "Quickstart"
-description: "Begin with a guide on the fastest path to a successful outcome"
+description: "Create your first charge in minutes"
 ---
 
-Describe how someone begins using your product. What is the first thing they need to do? Are there any prerequisites?
-
-A quickstart should take someone from zero to using your product. They'll get a quick win and a sense of what they can accomplish.
+This guide takes you from signing up to creating your first live charge.
 
 ## Prerequisites
 
-Before you begin, you must have:
-
-- Requirement one (for example, Node.js 18+, a free account, an API key)
-- Requirement two (for example, a compatible device, a compatible browser, a compatible operating system)
+- A LuminPay merchant account ([sign up here](https://app.luminpay.co))
+- Your organization must have completed email verification
 
 ## Get started
 
 <Steps>
-  <Step title="Install">
-    Describe how to install your product or sign up.
+  <Step title="Get your API key">
+    Sign in to your [LuminPay dashboard](https://app.luminpay.co), navigate to API Keys, and generate a new key.
 
-    ```bash
-    npm install your-package
-    ```
+    Keep this key secret -- treat it the same way you would a password.
   </Step>
-  <Step title="Configure">
-    Describe any setup or configuration needed before first use.
+  <Step title="Create a charge">
+    Make a request to create a charge, authenticating with your API key as a Bearer token.
 
-    ```bash
-    your-cli init
-    ```
+```bash
+    curl -X POST https://api.luminpay.co/charges \
+      -H "Authorization: Bearer YOUR_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "amount": 5000,
+        "currency": "NGN"
+      }'
+```
   </Step>
-  <Step title="Run it">
-    Show the first thing a user does to see it working.
+  <Step title="Check the charge status">
+    Poll the charge, or configure a webhook endpoint to be notified automatically when it's paid.
 
-    ```bash
-    your-cli start
-    ```
+```bash
+    curl https://api.luminpay.co/charges/{id} \
+      -H "Authorization: Bearer YOUR_API_KEY"
+```
   </Step>
 </Steps>
 
-<Tip>
-  Give people a way to get help. This could be a link to a support page, a chat with a customer support agent, or a forum for your product.
+## Fees and settlement
 
-  Example: Need help? Reach out to us at [support@yourcompany.com](mailto:support@yourcompany.com).
+LuminPay charges a flat 1% per transaction, with no setup or monthly fees. Stablecoin payments settle to your bank account once daily; Bitcoin payments are swept every 5 minutes and settle on the same daily cycle.
+
+New accounts start with a ₦50,000 daily limit. Complete identity verification to raise this to ₦500,000/day, or full business verification for unlimited daily volume.
+
+<Tip>
+  Need help? Reach out to us at [support@luminpay.co](mailto:support@luminpay.co).
 </Tip>

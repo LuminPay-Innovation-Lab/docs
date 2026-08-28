@@ -1,0 +1,30 @@
+---
+title: "Authentication"
+description: "How to authenticate your API requests"
+---
+
+LuminPay uses API keys to authenticate requests. You can generate and manage your keys from your [dashboard](https://app.luminpay.co).
+
+## Making authenticated requests
+
+Include your API key in the `Authorization` header of every request, as a Bearer token:
+
+```bash
+curl https://api.luminpay.co/charges \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+<Warning>
+  Keep your API key secret. Never expose it in client-side code, public repositories, or anywhere a third party could access it. If a key is compromised, revoke it immediately from your dashboard and generate a new one.
+</Warning>
+
+## Revoking a key
+
+If you need to rotate or retire a key, revoke it from the API Keys section of your dashboard, or programmatically:
+
+```bash
+curl -X PATCH https://api.luminpay.co/api-keys/{id}/revoke \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+Revoked keys stop working immediately.
