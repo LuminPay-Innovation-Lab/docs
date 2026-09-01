@@ -7,11 +7,18 @@ LuminPay uses API keys to authenticate requests. You can generate and manage you
 
 ## Making authenticated requests
 
-Include your API key in the `Authorization` header of every request, as a Bearer token:
+Include your API key in the `Authorization` header of every request, as a Bearer token. Use your Sandbox key against the Sandbox base URL while testing (see [Sandbox vs Live](/environments)):
+
+```bash
+curl https://sandbox-api.luminpay.co/charges \
+  -H "Authorization: Bearer YOUR_TEST_API_KEY"
+```
+
+Once you go live, switch to your Live key and the Live base URL:
 
 ```bash
 curl https://api.luminpay.co/charges \
-  -H "Authorization: Bearer YOUR_API_KEY"
+  -H "Authorization: Bearer YOUR_LIVE_API_KEY"
 ```
 
 <Warning>

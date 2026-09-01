@@ -18,12 +18,12 @@ This guide takes you from signing up to creating your first live charge.
 
     Keep this key secret -- treat it the same way you would a password.
   </Step>
-  <Step title="Create a charge">
-    Make a request to create a charge, authenticating with your API key as a Bearer token.
+  <Step title="Create a charge (Sandbox)">
+    New accounts start in Sandbox, using testnet chains and no real money. Make a request to create a charge, authenticating with your Sandbox API key (`lmp_test_...`) as a Bearer token.
 
 ```bash
-    curl -X POST https://api.luminpay.co/charges \
-      -H "Authorization: Bearer YOUR_API_KEY" \
+    curl -X POST https://sandbox-api.luminpay.co/charges \
+      -H "Authorization: Bearer YOUR_TEST_API_KEY" \
       -H "Content-Type: application/json" \
       -d '{
         "amount": 5000,
@@ -35,9 +35,12 @@ This guide takes you from signing up to creating your first live charge.
     Poll the charge, or configure a webhook endpoint to be notified automatically when it's paid.
 
 ```bash
-    curl https://api.luminpay.co/charges/{id} \
-      -H "Authorization: Bearer YOUR_API_KEY"
+    curl https://sandbox-api.luminpay.co/charges/{id} \
+      -H "Authorization: Bearer YOUR_TEST_API_KEY"
 ```
+  </Step>
+  <Step title="Go live">
+    Once your integration is tested and your business is Tier 2 verified, request to go live from your dashboard to receive a Live API key (`lmp_live_...`). Repeat the same requests against `https://api.luminpay.co` with your Live key instead. See [Sandbox vs Live](/environments) for the full comparison.
   </Step>
 </Steps>
 

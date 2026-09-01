@@ -1,0 +1,21 @@
+---
+title: "Sandbox vs Live"
+description: "Test safely before going live with real payments"
+---
+
+LuminPay has two fully separate environments. Build and test your integration in Sandbox first — no real money moves there — then switch to Live once you're ready to accept real customer payments.
+
+| Environment | Base URL | API key prefix | Chains |
+|---|---|---|---|
+| **Sandbox** | `https://sandbox-api.luminpay.co` | `lmp_test_...` | Testnet only |
+| **Live** | `https://api.luminpay.co` | `lmp_live_...` | Mainnet |
+
+Every endpoint in this documentation works identically in both environments — only the base URL and API key change. A `lmp_test_` key only works against the Sandbox base URL, and a `lmp_live_` key only against the Live one.
+
+<Warning>
+  Sandbox and Live are backed by completely separate databases. Charges, webhooks, and API keys created in one environment do not exist in the other.
+</Warning>
+
+## Getting a Live key
+
+New accounts start in Sandbox automatically. Once you've tested your integration and your business has completed Tier 2 verification, request to go live from your dashboard's Developers section to receive a `lmp_live_` key.
