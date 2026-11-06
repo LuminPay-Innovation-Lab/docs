@@ -1,0 +1,189 @@
+---
+title: "Webhooks"
+description: "Get told when a payment arrives, and check the message really came from LuminPay"
+---
+
+LuminPay sends an HTTPS `POST` to your endpoint when something happens on your account, such as a charge being paid.
+
+## Add an endpoint
+
+In your dashboard, open **Developers → Webhooks** and add your URL, or use the API:
+
+```bash
+curl -X POST "$LUMINPAY_BASE_URL/webhooks-platform/endpoints" \
+  -H "Authorization: Bearer $LUMINPAY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{ "url": "https://example.com/webhooks/luminpay" }'
+```
+
+The response includes `signingSecret` (`whsec_...`). Store it as a secret; you need it to verify each delivery.
+
+URL rules:
+- Live endpoints must use `https`. Sandbox also accepts `http`, which is handy with a tunnel such as ngrok.
+- The URL must be publicly reachable. `localhost`, private network addresses and URLs with a username or password are refused.
+
+## Send a test event
+
+```bash
+curl -X POST "$LUMINPAY_BASE_URL/webhooks-platform/endpoints/{endpointId}/test" \
+  -H "Authorization: Bearer $LUMINPAY_API_KEY"
+```
+
+This delivers a signed `webhook.test` event straight away and returns the delivery record, including your endpoint's `responseStatus`.
+
+## Events
+
+| Type | Sent when | `data` |
+|---|---|---|
+| `charge.paid` | A charge is paid in full (at least 99% of `amount`). | Charge fields below |
+| `charge.underpaid` | The customer sent less than 99% of `amount`. | Charge fields below |
+| `charge.expired` | A charge's 15 minutes ran out with no payment. | Charge fields below |
+| `invoice.paid` | An invoice is paid. | `invoiceId`, `reference`, `amountNgn` (kobo), `customerName` |
+| `refund.completed` | A refund has been sent to the customer. | `refundId`, `chargeId`, `amount`, `asset` |
+| `webhook.test` | You sent a test event. | `message` |
+
+Charge fields: `chargeId`, `reference`, `status`, `amount` (what arrived, in the smallest unit of `asset`), `asset` (the coin the customer paid with) and `amountNgn` (kobo, or `null`).
+
+<Note>
+  `charge.expired` can be followed by `charge.paid` for the same charge if the customer pays late. See [Statuses](/guides/payments#statuses).
+</Note>
+
+## What a delivery looks like
+
+```http
+POST /webhooks/luminpay HTTP/1.1
+Content-Type: application/json
+User-Agent: LuminPay-Webhooks/1.0
+X-LuminPay-Event: charge.paid
+X-LuminPay-Event-Id: evt_3f9a1c0e5b7d4e2a9c8b6f1d0e2a3b4c
+X-LuminPay-Delivery: 0b6d7a52-2f7e-4c11-9a51-6a3a9d0e5f21
+X-LuminPay-Timestamp: 1762423200
+X-LuminPay-Signature: t=1762423200,v1=5257a869e7ecebeda32affa62cdca3fa51cad7e77a0e56ff536d0ce8e108d8bd
+
+{
+  "id": "evt_3f9a1c0e5b7d4e2a9c8b6f1d0e2a3b4c",
+  "type": "charge.paid",
+  "created_at": "2026-11-06T10:00:00.000Z",
+  "livemode": true,
+  "data": {
+    "chargeId": "6f1c2d3e-8a9b-4c5d-9e0f-1a2b3c4d5e6f",
+    "reference": "order_1001",
+    "status": "paid",
+    "amount": "18050000",
+    "asset": "USDT_BSC_MAINNET",
+    "amountNgn": "2500000"
+  }
+}
+```
+
+| Header | Meaning |
+|---|---|
+| `X-LuminPay-Signature` | `t=<unix seconds>,v1=<signature>`. See below. |
+| `X-LuminPay-Event-Id` | Same as the body's `id`. Stays the same on every retry: use it to ignore duplicates. |
+| `X-LuminPay-Delivery` | Id of this delivery record. |
+| `X-LuminPay-Event` | Same as the body's `type`. |
+
+## Verify the signature
+
+`v1` is the HMAC-SHA256, in hex, of `<t>.<raw request body>`, keyed with your endpoint's signing secret. To verify:
+
+1. Read the **raw** request body. Don't parse and re-serialise the JSON first, or the signature won't match.
+2. Split the header into `t` and `v1`.
+3. Compute `HMAC_SHA256(secret, t + "." + rawBody)` and compare it to `v1` with a constant-time comparison.
+4. Reject the request if `t` is more than 5 minutes from your clock. This stops someone replaying an old delivery.
+
+<CodeGroup>
+```js Node.js (Express)
+import crypto from 'node:crypto';
+import express from 'express';
+
+const app = express();
+const secret = process.env.LUMINPAY_WEBHOOK_SECRET;
+
+app.post('/webhooks/luminpay', express.raw({ type: 'application/json' }), (req, res) => {
+  const header = req.get('X-LuminPay-Signature') ?? '';
+  const parts = Object.fromEntries(header.split(',').map((p) => p.split('=')));
+  const expected = crypto
+    .createHmac('sha256', secret)
+    .update(`${parts.t}.${req.body}`)
+    .digest('hex');
+
+  const valid =
+    parts.v1?.length === expected.length &&
+    crypto.timingSafeEqual(Buffer.from(parts.v1), Buffer.from(expected));
+  const fresh = Math.abs(Date.now() / 1000 - Number(parts.t)) < 300;
+  if (!valid || !fresh) return res.sendStatus(400);
+
+  const event = JSON.parse(req.body);
+  // Ignore event.id values you've already handled, then:
+  if (event.type === 'charge.paid') {
+    // mark order event.data.reference as paid
+  }
+  res.sendStatus(200);
+});
+```
+
+```python Python (Flask)
+import hashlib, hmac, os, time
+from flask import Flask, request, abort
+
+app = Flask(__name__)
+SECRET = os.environ["LUMINPAY_WEBHOOK_SECRET"].encode()
+
+@app.post("/webhooks/luminpay")
+def luminpay_webhook():
+    raw = request.get_data()  # raw bytes
+    parts = dict(p.split("=", 1) for p in request.headers.get("X-LuminPay-Signature", "").split(",") if "=" in p)
+    expected = hmac.new(SECRET, f"{parts.get('t')}.".encode() + raw, hashlib.sha256).hexdigest()
+    if not hmac.compare_digest(expected, parts.get("v1", "")):
+        abort(400)
+    if abs(time.time() - int(parts.get("t", 0))) > 300:
+        abort(400)
+
+    event = request.get_json()
+    # Ignore event["id"] values you've already handled, then:
+    if event["type"] == "charge.paid":
+        pass  # mark order event["data"]["reference"] as paid
+    return "", 200
+```
+
+```php PHP
+<?php
+$secret = getenv('LUMINPAY_WEBHOOK_SECRET');
+$raw = file_get_contents('php://input');
+parse_str(str_replace(',', '&', $_SERVER['HTTP_X_LUMINPAY_SIGNATURE'] ?? ''), $parts);
+
+$expected = hash_hmac('sha256', ($parts['t'] ?? '') . '.' . $raw, $secret);
+if (!hash_equals($expected, $parts['v1'] ?? '') || abs(time() - (int)($parts['t'] ?? 0)) > 300) {
+    http_response_code(400);
+    exit;
+}
+
+$event = json_decode($raw, true);
+if ($event['type'] === 'charge.paid') {
+    // mark order $event['data']['reference'] as paid
+}
+http_response_code(200);
+```
+</CodeGroup>
+
+## Respond quickly
+
+Return any `2xx` status within 10 seconds. Do slow work, such as sending emails, after you respond.
+
+## Retries
+
+If your endpoint returns anything other than `2xx`, or doesn't answer within 10 seconds, LuminPay tries again after 1 minute, 5 minutes, 30 minutes and 2 hours: five attempts in all. After that the delivery is marked failed. You can see every attempt, with your endpoint's status code and response, under **Developers → Webhooks** or with `GET /webhooks-platform/events`.
+
+Because of retries, the same event can arrive more than once. Use `id` to process each event only once.
+
+## Turn an endpoint off
+
+```bash
+curl -X PATCH "$LUMINPAY_BASE_URL/webhooks-platform/endpoints/{endpointId}/status" \
+  -H "Authorization: Bearer $LUMINPAY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{ "status": "disabled" }'
+```
+
+Send `"active"` to turn it back on. Disabled endpoints receive nothing.

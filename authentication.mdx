@@ -1,37 +1,37 @@
 ---
 title: "Authentication"
-description: "How to authenticate your API requests"
+description: "Authenticate API requests with a secret key"
 ---
 
-LuminPay uses API keys to authenticate requests. You can generate and manage your keys from your [dashboard](https://app.luminpay.co).
-
-## Making authenticated requests
-
-Include your API key in the `Authorization` header of every request, as a Bearer token. Use your Sandbox key against the Sandbox base URL while testing (see [Sandbox vs Live](/environments)):
+Send your API key as a Bearer token on every request:
 
 ```bash
 curl https://sandbox-api.luminpay.co/charges \
-  -H "Authorization: Bearer YOUR_TEST_API_KEY"
+  -H "Authorization: Bearer lmp_test_..."
 ```
 
-Once you go live, switch to your Live key and the Live base URL:
+| Key | Works with |
+|---|---|
+| `lmp_test_...` | `https://sandbox-api.luminpay.co` |
+| `lmp_live_...` | `https://api.luminpay.co` |
 
-```bash
-curl https://api.luminpay.co/charges \
-  -H "Authorization: Bearer YOUR_LIVE_API_KEY"
-```
+## Managing keys
+
+Create and revoke keys in your dashboard under **Developers → API keys**. For security, keys can't be created, listed or revoked with an API key; only a signed-in dashboard user can do it.
+
+- The full key is shown once, when you create it. LuminPay stores only a hash.
+- Revoked keys stop working immediately.
+- To rotate a key, create the new one, deploy it, then revoke the old one.
 
 <Warning>
-  Keep your API key secret. Never expose it in client-side code, public repositories, or anywhere a third party could access it. If a key is compromised, revoke it immediately from your dashboard and generate a new one.
+  Your API key can create charges and read your payments. Keep it on your server. Never put it in a website, mobile app, or public repository. If a key leaks, revoke it straight away.
 </Warning>
 
-## Revoking a key
+## Authentication errors
 
-If you need to rotate or retire a key, revoke it from the API Keys section of your dashboard, or programmatically:
-
-```bash
-curl -X PATCH https://api.luminpay.co/api-keys/{id}/revoke \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
-
-Revoked keys stop working immediately.
+| Status | Message | What to do |
+|---|---|---|
+| `401` | `Missing or malformed Authorization header.` | Send `Authorization: Bearer <key>`. |
+| `401` | `This is a Sandbox key (lmp_test_). Use it with https://sandbox-api.luminpay.co.` | Use the base URL that matches the key. |
+| `401` | `This is a Live key (lmp_live_). Use it with https://api.luminpay.co.` | Use the base URL that matches the key. |
+| `401` | `Invalid or revoked API key.` | Check the key was copied in full, or create a new one. |

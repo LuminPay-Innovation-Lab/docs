@@ -1,20 +1,31 @@
 ---
 title: "Introduction"
-description: "Accept crypto and stablecoin payments, settle to your bank account"
+description: "Accept stablecoin and Bitcoin payments, and settle in naira"
 ---
 
-LuminPay is a payments infrastructure for merchants who want to accept crypto and stablecoin payments and settle directly into their local bank account. This documentation covers everything you need to integrate LuminPay into your own product or platform.
+LuminPay lets your customers pay with USDT, USDC or Bitcoin while you receive naira in your bank account. This documentation covers the API for building payments into your own website, app or platform.
 
 <Tip>
-  New here? Start with the [Quickstart](/quickstart) to create your first charge in minutes.
+  New here? The [Quickstart](/quickstart) takes you to a paid test charge in about ten minutes.
 </Tip>
 
-<Card title="Quickstart" icon="rocket" href="/quickstart">
-  Get your API key and create your first charge.
-</Card>
-<Card title="Authentication" icon="key" href="/authentication">
-  Learn how API keys work and how to authenticate your requests.
-</Card>
-<Card title="API Reference" icon="code" href="/api-reference">
-  Full reference for every endpoint: charges, invoices, payment links, payouts, refunds, and more.
-</Card>
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Create a key and take a test payment.
+  </Card>
+  <Card title="Sandbox and Live" icon="flask" href="/environments">
+    Base URLs, keys, and how to go live.
+  </Card>
+  <Card title="Accept a payment" icon="credit-card" href="/guides/payments">
+    Charges, amounts, statuses and idempotency.
+  </Card>
+  <Card title="Webhooks" icon="bell" href="/guides/webhooks">
+    Events, signatures and retries.
+  </Card>
+  <Card title="Networks and test coins" icon="link" href="/guides/networks">
+    Supported coins and where to get test coins.
+  </Card>
+  <Card title="API reference" icon="code" href="/api-reference/introduction">
+    Every endpoint, with a playground.
+  </Card>
+</CardGroup>

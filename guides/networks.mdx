@@ -1,0 +1,47 @@
+---
+title: "Networks and test coins"
+description: "The coins and networks LuminPay accepts, and where to get test coins"
+---
+
+Every charge offers the customer all the networks below for its environment. The `asset` you send when creating a charge sets the coin the quote is shown in first.
+
+## Live
+
+| `asset` | Coin | Network | Decimals (`scale`) | Token contract |
+|---|---|---|---|---|
+| `USDT_BSC_MAINNET` | USDT | BNB Smart Chain (BEP-20) | 18 | `0x55d398326f99059fF775485246999027B3197955` |
+| `USDT_TRON_MAINNET` | USDT | Tron (TRC-20) | 6 | `TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t` |
+| `USDT_SOLANA_MAINNET` | USDT | Solana (SPL) | 6 | `Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB` |
+| `USDC_ETH_MAINNET` | USDC | Ethereum (ERC-20) | 6 | `0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48` |
+| `USDC_SOLANA_MAINNET` | USDC | Solana (SPL) | 6 | `EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v` |
+| `BTC_MAINNET` | Bitcoin | Bitcoin | 8 | — |
+
+## Sandbox
+
+| `asset` | Coin | Network | Decimals (`scale`) | Token contract |
+|---|---|---|---|---|
+| `USDC_ETH_TEST5_AN74` | USDC | Ethereum Sepolia | 6 | `0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238` |
+| `USDT_BSC_TEST` | USDT | BNB Smart Chain testnet | 18 | `0x337610d27c682E347C9cD60BD4b3b107C9d34dDd` |
+| `USDC_SOLANA_DEVNET` | USDC | Solana devnet | 6 | `4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU` |
+| `BTC_TEST` | Bitcoin | Bitcoin testnet3 | 8 | — |
+
+<Warning>
+  Customers must send the right coin on the right network. USDT sent on Tron to a BNB Smart Chain address can't be recovered automatically. The hosted checkout shows the network clearly; if you build your own page, do the same.
+</Warning>
+
+## Getting test coins
+
+| Network | Test coins | Gas |
+|---|---|---|
+| Ethereum Sepolia | USDC from [faucet.circle.com](https://faucet.circle.com) (choose Ethereum Sepolia) | Sepolia ETH from any Sepolia faucet |
+| Solana devnet | USDC from [faucet.circle.com](https://faucet.circle.com) (choose Solana Devnet) | Devnet SOL from [faucet.solana.com](https://faucet.solana.com) |
+| BNB Smart Chain testnet | USDT from the [BNB Chain testnet faucet](https://www.bnbchain.org/en/testnet-faucet) | tBNB from the same faucet |
+| Bitcoin testnet3 | Testnet BTC from any testnet3 faucet | — |
+
+Check that the token contract in your wallet matches the table above. Test tokens with the same name on a different contract won't be detected.
+
+You can watch test payments on [sepolia.etherscan.io](https://sepolia.etherscan.io), [testnet.bscscan.com](https://testnet.bscscan.com), [explorer.solana.com](https://explorer.solana.com/?cluster=devnet) (devnet) and [mempool.space/testnet](https://mempool.space/testnet).
+
+## Confirmation times
+
+Stablecoin payments usually confirm within a minute. Bitcoin needs one block confirmation, about 10 minutes on average, and sometimes longer. Every network is checked at least every two minutes, so `charge.paid` arrives within a couple of minutes of confirmation.

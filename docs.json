@@ -14,19 +14,40 @@
         "tab": "Documentation",
         "groups": [
           {
-            "group": "Getting Started",
+            "group": "Getting started",
             "pages": [
               "index",
               "quickstart",
               "environments",
               "authentication"
             ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/payments",
+              "guides/webhooks",
+              "guides/networks",
+              "guides/errors",
+              "guides/postman"
+            ]
           }
         ]
       },
       {
         "tab": "API Reference",
-        "openapi": "openapi.json"
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "api-reference/introduction"
+            ]
+          },
+          {
+            "group": "Endpoints",
+            "openapi": "openapi.json"
+          }
+        ]
       }
     ]
   },
@@ -39,6 +60,10 @@
       {
         "label": "Support",
         "href": "mailto:support@luminpay.co"
+      },
+      {
+        "label": "Sandbox",
+        "href": "https://sandbox.luminpay.co"
       }
     ],
     "primary": {

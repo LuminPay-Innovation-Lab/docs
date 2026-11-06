@@ -1,0 +1,21 @@
+---
+title: "API reference"
+description: "Base URLs, authentication and conventions for every endpoint"
+---
+
+| Environment | Base URL | Key |
+|---|---|---|
+| Sandbox | `https://sandbox-api.luminpay.co` | `lmp_test_...` |
+| Live | `https://api.luminpay.co` | `lmp_live_...` |
+
+Send `Authorization: Bearer <key>` on every request and `Content-Type: application/json` on requests with a body. See [Authentication](/authentication).
+
+## Conventions
+
+- **Money is sent as strings of digits**, never numbers, so nothing is lost to rounding. Naira amounts you send are whole naira (`"25000"`); naira amounts LuminPay returns are kobo (`"2500000"`). Coin amounts are in the coin's smallest unit; divide by 10 to the power of `scale`.
+- **Ids are UUIDs.** A malformed id returns `400`.
+- **Lists** return at most 100 items. Charges are paged with `cursor`.
+- **Errors** follow one format. See [Errors](/guides/errors).
+- **Rate limit:** 100 requests a minute per IP address.
+
+The pages in this section are generated from [openapi.json](https://raw.githubusercontent.com/LuminPay-Innovation-Lab/docs/main/openapi.json), which you can also import into Postman. See [Postman collection](/guides/postman).
