@@ -1,55 +1,74 @@
 ---
 title: "Quickstart"
-description: "Create your first charge in minutes"
+description: "Take a test payment in Sandbox in about ten minutes"
 ---
 
-This guide takes you from signing up to creating your first live charge.
-
-## Prerequisites
-
-- A LuminPay merchant account ([sign up here](https://app.luminpay.co))
-- Your organization must have completed email verification
-
-## Get started
+This guide gets you from a new account to a paid test charge, using testnet coins and no real money.
 
 <Steps>
-  <Step title="Get your API key">
-    Sign in to your [LuminPay dashboard](https://app.luminpay.co), navigate to API Keys, and generate a new key.
+  <Step title="Create a Sandbox account and API key">
+    Sign up at [sandbox.luminpay.co](https://sandbox.luminpay.co), open **Developers → API keys**, and create a key. Sandbox keys start with `lmp_test_`.
 
-    Keep this key secret -- treat it the same way you would a password.
+    The full key is shown once. Store it in your server's secrets, never in a browser or mobile app.
   </Step>
-  <Step title="Create a charge (Sandbox)">
-    New accounts start in Sandbox, using testnet chains and no real money. Make a request to create a charge, authenticating with your Sandbox API key (`lmp_test_...`) as a Bearer token.
+  <Step title="Create a charge">
+    Ask for an amount in naira and the coin the customer will pay with. LuminPay works out the coin amount and returns the payment address.
 
 ```bash
-    curl -X POST https://sandbox-api.luminpay.co/charges \
-      -H "Authorization: Bearer YOUR_TEST_API_KEY" \
-      -H "Content-Type: application/json" \
-      -d '{
-        "amount": 5000,
-        "currency": "NGN"
-      }'
+curl -X POST https://sandbox-api.luminpay.co/charges \
+  -H "Authorization: Bearer $LUMINPAY_TEST_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amountNgn": "5000",
+    "asset": "USDC_ETH_TEST5_AN74",
+    "reference": "order_1001"
+  }'
 ```
-  </Step>
-  <Step title="Check the charge status">
-    Poll the charge, or configure a webhook endpoint to be notified automatically when it's paid.
 
-```bash
-    curl https://sandbox-api.luminpay.co/charges/{id} \
-      -H "Authorization: Bearer YOUR_TEST_API_KEY"
+    The response:
+
+```json
+{
+  "chargeId": "6f1c2d3e-8a9b-4c5d-9e0f-1a2b3c4d5e6f",
+  "reference": "order_1001",
+  "amount": "3646209",
+  "amountNgn": "500000",
+  "feeAmount": "36101",
+  "rate": "1385",
+  "asset": "USDC_ETH_TEST5_AN74",
+  "address": null,
+  "addresses": [],
+  "txHash": null,
+  "expiresAt": "2026-11-06T10:15:00.000Z",
+  "status": "pending"
+}
 ```
+
+    Payment addresses are created a few seconds after the charge. Fetch the charge again to get them (next step).
+
+    <Note>
+      `amountNgn` is sent in **whole naira** (`"5000"` is ₦5,000) but returned in **kobo** (`"500000"`). `amount` is in the coin's smallest unit: USDC has 6 decimals, so `"3646209"` is 3.646209 USDC. `amount` already includes `feeAmount`, the LuminPay fee the customer pays on top.
+    </Note>
+  </Step>
+  <Step title="Show the customer where to pay">
+```bash
+curl https://sandbox-api.luminpay.co/charges/6f1c2d3e-8a9b-4c5d-9e0f-1a2b3c4d5e6f \
+  -H "Authorization: Bearer $LUMINPAY_TEST_KEY"
+```
+
+    `addresses` lists one address per network the customer can pay on, each with its own `amount` and `scale` (number of decimals). Show the address and amount for the network your customer picks, or send them to the hosted checkout page at `https://sandbox.luminpay.co/pay/{chargeId}`.
+  </Step>
+  <Step title="Pay with test coins">
+    Send the exact amount from a testnet wallet. [Networks and test coins](/guides/networks) lists the faucets for each network.
+  </Step>
+  <Step title="Get told when it's paid">
+    Add a webhook endpoint and LuminPay sends `charge.paid` when the payment confirms. See [Webhooks](/guides/webhooks). Until then you can poll `GET /charges/{id}`, which returns `status: "paid"` and the `txHash`.
   </Step>
   <Step title="Go live">
-    Once your integration is tested and your business is Tier 2 verified, request to go live from your dashboard to receive a Live API key (`lmp_live_...`). Repeat the same requests against `https://api.luminpay.co` with your Live key instead. See [Sandbox vs Live](/environments) for the full comparison.
+    When your integration works in Sandbox, follow [Going live](/environments#going-live). Your code stays the same; only the base URL and key change.
   </Step>
 </Steps>
 
-## Fees and settlement
-
-LuminPay charges a flat 1% per transaction, with no setup or monthly fees. Stablecoin payments settle to your bank account once daily; Bitcoin payments are swept every 5 minutes and settle on the same daily cycle.
-
-New accounts start with a ₦50,000 daily limit. Complete identity verification to raise this to ₦500,000/day, or full business verification for unlimited daily volume.
-
 <Tip>
-  Need help? Reach out to us at [support@luminpay.co](mailto:support@luminpay.co).
+  Need help? Email [support@luminpay.co](mailto:support@luminpay.co).
 </Tip>

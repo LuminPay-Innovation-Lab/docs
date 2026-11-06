@@ -1,0 +1,20 @@
+---
+title: "Postman collection"
+description: "Try every endpoint from Postman"
+---
+
+<Steps>
+  <Step title="Import the collection">
+    Download [luminpay.postman_collection.json](https://raw.githubusercontent.com/LuminPay-Innovation-Lab/docs/main/luminpay.postman_collection.json) and import it into Postman (**File → Import**).
+  </Step>
+  <Step title="Set your key">
+    Open the collection's **Variables** tab and set `apiKey` to your `lmp_test_` key. `baseUrl` is already set to Sandbox.
+  </Step>
+  <Step title="Create a charge">
+    Run **Charges → Create a charge**. The new `chargeId` is saved to the `id` variable, so **Get a charge** works straight after.
+  </Step>
+</Steps>
+
+To use Live, set `baseUrl` to `https://api.luminpay.co` and `apiKey` to your `lmp_live_` key, and change `asset` in the request bodies to a [mainnet asset](/guides/networks#live).
+
+You can also import [openapi.json](https://raw.githubusercontent.com/LuminPay-Innovation-Lab/docs/main/openapi.json) into Postman, Insomnia or any OpenAPI tool.

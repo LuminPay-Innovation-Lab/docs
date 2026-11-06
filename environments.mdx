@@ -1,21 +1,49 @@
 ---
-title: "Sandbox vs Live"
-description: "Test safely before going live with real payments"
+title: "Sandbox and Live"
+description: "Test with testnet coins, then switch two values to go live"
 ---
 
-LuminPay has two fully separate environments. Build and test your integration in Sandbox first — no real money moves there — then switch to Live once you're ready to accept real customer payments.
+LuminPay has two separate environments. Build and test in Sandbox, where only testnet coins move, then switch to Live to accept real payments.
 
-| Environment | Base URL | API key prefix | Chains |
-|---|---|---|---|
-| **Sandbox** | `https://sandbox-api.luminpay.co` | `lmp_test_...` | Testnet only |
-| **Live** | `https://api.luminpay.co` | `lmp_live_...` | Mainnet |
+| | Sandbox | Live |
+|---|---|---|
+| Dashboard | [sandbox.luminpay.co](https://sandbox.luminpay.co) | [app.luminpay.co](https://app.luminpay.co) |
+| API base URL | `https://sandbox-api.luminpay.co` | `https://api.luminpay.co` |
+| API key prefix | `lmp_test_` | `lmp_live_` |
+| Coins | Testnet only | Mainnet |
+| Identity verification | Not needed to take test payments | Needed before the first payment |
+| Webhook URLs | `http` or `https` | `https` only |
+| `livemode` in webhooks | `false` | `true` |
 
-Every endpoint in this documentation works identically in both environments — only the base URL and API key change. A `lmp_test_` key only works against the Sandbox base URL, and a `lmp_live_` key only against the Live one.
+Every endpoint behaves the same in both. Only the base URL and the key change, so keep both in configuration:
+
+```bash
+LUMINPAY_BASE_URL=https://sandbox-api.luminpay.co
+LUMINPAY_API_KEY=lmp_test_...
+```
 
 <Warning>
-  Sandbox and Live are backed by completely separate databases. Charges, webhooks, and API keys created in one environment do not exist in the other.
+  Keys only work in their own environment. A `lmp_test_` key sent to the Live API, or a `lmp_live_` key sent to Sandbox, is refused with `401` and a message naming the right base URL.
 </Warning>
 
-## Getting a Live key
+Sandbox and Live have separate databases. Charges, webhook endpoints, API keys and accounts created in one do not exist in the other.
 
-New accounts start in Sandbox automatically. Once you've tested your integration and your business has completed Tier 2 verification, request to go live from your dashboard's Developers section to receive a `lmp_live_` key.
+## Going live
+
+<Steps>
+  <Step title="Create your Live account">
+    Sign up at [app.luminpay.co](https://app.luminpay.co).
+  </Step>
+  <Step title="Verify your identity">
+    Verify with your NIN, BVN and a selfie. Once verified you can accept payments up to ₦200,000 a day. Complete business verification (CAC documents) to remove the daily limit.
+  </Step>
+  <Step title="Add a bank account">
+    Add the account LuminPay pays your naira into.
+  </Step>
+  <Step title="Create a Live key and webhook">
+    In **Developers**, create a `lmp_live_` key and add your `https` webhook endpoint. Each environment has its own webhook signing secret.
+  </Step>
+  <Step title="Switch your configuration">
+    Set `LUMINPAY_BASE_URL=https://api.luminpay.co` and your Live key. Change the `asset` values you send to the mainnet ones in [Networks](/guides/networks).
+  </Step>
+</Steps>

@@ -1,0 +1,73 @@
+---
+title: "Payment links and invoices"
+description: "Get paid without building a checkout"
+---
+
+Both give you a LuminPay-hosted page to share by WhatsApp, email, SMS or social media. The customer picks a coin and network, pays, and you're settled in naira. You can create them in the dashboard or with the API.
+
+| | Payment link | Invoice |
+|---|---|---|
+| Use it for | A product, service or donation, paid by anyone, any number of times | One bill to one named customer |
+| Amount | Fixed, or the customer types it | Fixed |
+| Paid | Every time someone pays | Once |
+| Hosted page | `https://app.luminpay.co/l/{slug}` | `https://app.luminpay.co/invoice/{reference}` |
+| Fee | Included in your price; the customer pays exactly what you set | Same |
+
+In Sandbox the pages are on `sandbox.luminpay.co`, and customers pay with [test coins](/guides/networks#getting-test-coins).
+
+## Create a payment link
+
+```bash
+curl -X POST "$LUMINPAY_BASE_URL/payment-links" \
+  -H "Authorization: Bearer $LUMINPAY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Haircut and beard trim",
+    "amountType": "fixed",
+    "fixedAmountNgn": "5000",
+    "successRedirectUrl": "https://example.com/thanks"
+  }'
+```
+
+| Field | Notes |
+|---|---|
+| `title` | Shown to the customer. Up to 120 characters. |
+| `description` | Optional. Up to 1,000 characters. |
+| `amountType` | `fixed`, or `flexible` to let the customer enter the amount. |
+| `fixedAmountNgn` | Whole naira, required for `fixed`: `"5000"` is ₦5,000. |
+| `successRedirectUrl` | Optional. Where to send the customer after paying. Must start with `https://` on Live. |
+
+The response includes `url`; that's the link to share. `fixedAmountNgn` comes back in kobo (`"500000"`), like every naira amount the API returns.
+
+Turn a link off with `PATCH /payment-links/{id}/status` and `{"status": "inactive"}`; customers then see that it's no longer active. See every payment made through a link with `GET /payment-links/{id}/charges`.
+
+## Create an invoice
+
+```bash
+curl -X POST "$LUMINPAY_BASE_URL/invoices" \
+  -H "Authorization: Bearer $LUMINPAY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "customerName": "Ada Obi",
+    "customerEmail": "ada@example.com",
+    "description": "Website design, October",
+    "amountNgn": "250000",
+    "dueDate": "2026-11-30"
+  }'
+```
+
+`amountNgn` is whole naira. Send the returned `url` to your customer. The customer's email is never shown on the public page.
+
+- An invoice can be paid once. Its `status` goes from `sent` to `paid`.
+- Each time the customer opens it, they get 15 minutes to pay the quoted amount. If they come back later, a fresh quote is made automatically.
+- A payment for less than the full amount leaves the invoice open; you'll see what arrived in the dashboard.
+- Cancel an unpaid invoice with `PATCH /invoices/{id}/void`.
+
+## Know when you're paid
+
+Listen for webhooks:
+
+- `charge.paid` for every payment. Its `data` includes `paymentLinkId` or `invoiceId`, so you can tell which link or invoice it came through.
+- `invoice.paid` when an invoice is settled, with `invoiceId` and `reference`.
+
+See [Webhooks](/guides/webhooks) for verifying them.

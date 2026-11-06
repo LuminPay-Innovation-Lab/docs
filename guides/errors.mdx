@@ -1,0 +1,55 @@
+---
+title: "Errors"
+description: "Status codes, the error body, and what to do about each"
+---
+
+Errors return a JSON body:
+
+```json
+{
+  "statusCode": 400,
+  "message": "Provide either amount or amountNgn.",
+  "error": "Bad Request"
+}
+```
+
+When a request fails validation, `message` is a list with one entry per problem:
+
+```json
+{
+  "statusCode": 400,
+  "message": ["amountNgn must be a positive integer string (whole naira, max 12 digits)"],
+  "error": "Bad Request"
+}
+```
+
+Some errors add a `code` you can act on in your code, for example:
+
+```json
+{
+  "statusCode": 403,
+  "error": "Forbidden",
+  "code": "MERCHANT_KYC_NOT_APPROVED",
+  "message": "Complete business verification before you can accept payments.",
+  "kycStatus": "NOT_STARTED",
+  "action": "charge_creation"
+}
+```
+
+## Status codes
+
+| Status | Meaning | Common causes |
+|---|---|---|
+| `400` | The request is invalid. | Missing `asset`; `amountNgn` with decimals or a currency sign; an id that isn't a UUID; an unsupported `asset`. |
+| `401` | No valid key. | Missing header; revoked key; a Sandbox key on Live or a Live key on Sandbox. |
+| `403` | The key is valid but the action isn't allowed. | Verification not finished (Live); the charge is over your daily limit; managing API keys with an API key; charge creation is paused for maintenance. |
+| `404` | Not found. | The charge or endpoint doesn't exist, or belongs to another account. |
+| `409` | Conflict. | The `reference` is already used by another account. |
+| `429` | Too many requests. | More than 100 requests a minute from one IP address. Wait, then retry with backoff. |
+| `5xx` | A problem on our side. | Retry with backoff. A retry with the same `reference` won't create a second charge. |
+
+## Codes
+
+| `code` | Meaning |
+|---|---|
+| `MERCHANT_KYC_NOT_APPROVED` | Your Live account hasn't finished verification. `kycStatus` shows where it is. Finish verification in the dashboard. |

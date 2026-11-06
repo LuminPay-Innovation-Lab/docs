@@ -1,0 +1,480 @@
+{
+  "info": {
+    "name": "LuminPay API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Set baseUrl and apiKey in the collection variables. Sandbox: https://sandbox-api.luminpay.co with a lmp_test_ key. Live: https://api.luminpay.co with a lmp_live_ key. Create a charge stores its chargeId in {{id}}."
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{apiKey}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://sandbox-api.luminpay.co"
+    },
+    {
+      "key": "apiKey",
+      "value": "lmp_test_replace_me"
+    },
+    {
+      "key": "id",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Charges",
+      "item": [
+        {
+          "name": "Create a charge",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/charges",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "charges"
+              ]
+            },
+            "description": "Create a charge",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amountNgn\": \"5000\",\n  \"asset\": \"USDC_ETH_TEST5_AN74\",\n  \"reference\": \"{{$guid}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.chargeId) pm.collectionVariables.set('id', j.chargeId);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List charges",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/charges",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "charges"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "cursor",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "outletId",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "List charges"
+          }
+        },
+        {
+          "name": "Get a charge",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/charges/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "charges",
+                "{{id}}"
+              ]
+            },
+            "description": "Get a charge"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Webhooks",
+      "item": [
+        {
+          "name": "Add a webhook endpoint",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/webhooks-platform/endpoints",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "webhooks-platform",
+                "endpoints"
+              ]
+            },
+            "description": "Add a webhook endpoint",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://example.com/webhooks/luminpay\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "List webhook endpoints",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/webhooks-platform/endpoints",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "webhooks-platform",
+                "endpoints"
+              ]
+            },
+            "description": "List webhook endpoints"
+          }
+        },
+        {
+          "name": "Turn an endpoint on or off",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/webhooks-platform/endpoints/{{id}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "webhooks-platform",
+                "endpoints",
+                "{{id}}",
+                "status"
+              ]
+            },
+            "description": "Turn an endpoint on or off",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"disabled\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Send a test event",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/webhooks-platform/endpoints/{{id}}/test",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "webhooks-platform",
+                "endpoints",
+                "{{id}}",
+                "test"
+              ]
+            },
+            "description": "Send a test event"
+          }
+        },
+        {
+          "name": "List webhook deliveries",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/webhooks-platform/events",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "webhooks-platform",
+                "events"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "List webhook deliveries"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payment links",
+      "item": [
+        {
+          "name": "Create a payment link",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/payment-links",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payment-links"
+              ]
+            },
+            "description": "Create a payment link",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Haircut\",\n  \"amountType\": \"fixed\",\n  \"fixedAmountNgn\": \"5000\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "List payment links",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/payment-links",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payment-links"
+              ]
+            },
+            "description": "List payment links"
+          }
+        },
+        {
+          "name": "Get a payment link",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/payment-links/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payment-links",
+                "{{id}}"
+              ]
+            },
+            "description": "Get a payment link"
+          }
+        },
+        {
+          "name": "List charges made through a payment link",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/payment-links/{{id}}/charges",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payment-links",
+                "{{id}}",
+                "charges"
+              ]
+            },
+            "description": "List charges made through a payment link"
+          }
+        },
+        {
+          "name": "Turn a payment link on or off",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/payment-links/{{id}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payment-links",
+                "{{id}}",
+                "status"
+              ]
+            },
+            "description": "Turn a payment link on or off",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"inactive\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invoices",
+      "item": [
+        {
+          "name": "Create an invoice",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/invoices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "invoices"
+              ]
+            },
+            "description": "Create an invoice",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerName\": \"Ada Obi\",\n  \"customerEmail\": \"ada@example.com\",\n  \"amountNgn\": \"25000\",\n  \"description\": \"Website design\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "List invoices",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/invoices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "invoices"
+              ]
+            },
+            "description": "List invoices"
+          }
+        },
+        {
+          "name": "Get an invoice",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/invoices/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "invoices",
+                "{{id}}"
+              ]
+            },
+            "description": "Get an invoice"
+          }
+        },
+        {
+          "name": "Void an invoice",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/invoices/{{id}}/void",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "invoices",
+                "{{id}}",
+                "void"
+              ]
+            },
+            "description": "Void an invoice"
+          }
+        }
+      ]
+    }
+  ]
+}

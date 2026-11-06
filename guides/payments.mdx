@@ -1,0 +1,100 @@
+---
+title: "Accept a payment"
+description: "Create a charge, show the customer where to pay, and confirm it"
+---
+
+A **charge** is one payment request. You choose the naira amount; the customer pays the coin equivalent on a network they choose, and you are settled in naira.
+
+## Create a charge
+
+`POST /charges`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `asset` | string | Yes | The coin you quote in, for example `USDT_BSC_MAINNET`. See [Networks](/guides/networks). |
+| `amountNgn` | string | One of `amountNgn` or `amount` | Whole naira, digits only: `"25000"` is ₦25,000. Up to 12 digits. |
+| `amount` | string | One of `amountNgn` or `amount` | The coin amount in its smallest unit, digits only. |
+| `reference` | string | No | Your own id for this payment, such as your order id. See [Idempotency](#idempotency). |
+
+Use `amountNgn` for almost every integration. LuminPay converts it at the current rate and quotes every supported network in one charge.
+
+```bash
+curl -X POST "$LUMINPAY_BASE_URL/charges" \
+  -H "Authorization: Bearer $LUMINPAY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{ "amountNgn": "25000", "asset": "USDT_BSC_MAINNET", "reference": "order_1001" }'
+```
+
+## The charge object
+
+| Field | Notes |
+|---|---|
+| `chargeId` | UUID. Use it with `GET /charges/{chargeId}`. |
+| `reference` | Yours, or a generated `chg_...` if you sent none. |
+| `status` | See [Statuses](#statuses). |
+| `asset` | The quoted coin. Once paid, the coin the customer actually paid with. |
+| `amount` | What the customer pays in `asset`, in its smallest unit. Includes `feeAmount`. |
+| `feeAmount` | The LuminPay fee inside `amount`. |
+| `amountNgn` | The naira amount **in kobo** (`"2500000"` is ₦25,000), or `null` if you created the charge with `amount`. |
+| `rate` | Naira per US dollar used for the quote. |
+| `addresses` | One entry per network: `asset`, `chain`, `address`, `amount` (smallest unit) and `scale` (decimals). |
+| `address` | The first address in `addresses`, for single-network integrations. |
+| `txHash` | The customer's transaction, once paid. |
+| `expiresAt` | When the quote ends: 15 minutes after creation. |
+
+<Note>
+  Addresses are created a few seconds after the charge, so the create response usually has `addresses: []`. Fetch the charge with `GET /charges/{chargeId}` to get them.
+</Note>
+
+To show a coin amount, divide by 10 to the power of `scale`. For example, `{"amount": "18050000", "scale": 6}` is 18.05.
+
+## Show the customer where to pay
+
+You have two options:
+
+- **Hosted checkout.** Redirect the customer to `https://app.luminpay.co/pay/{chargeId}` (Sandbox: `https://sandbox.luminpay.co/pay/{chargeId}`). It shows every network, a QR code and a live status.
+- **Your own page.** Show the `address` and `amount` from `addresses` for the network the customer picks. Tell them to send the exact amount on that network only.
+
+## Statuses
+
+| Status | Meaning | What to do |
+|---|---|---|
+| `pending` | Waiting for the customer to pay. | Wait. |
+| `paid` | Paid in full. A payment of at least 99% of `amount` counts as paid. | Fulfil the order. |
+| `underpaid` | The customer sent less than 99%. | Contact the customer. Your dashboard shows what arrived. |
+| `expired` | Nobody paid within 15 minutes. | Create a new charge if the customer still wants to pay. |
+| `failed`, `cancelled` | The charge can't be paid. | Create a new charge. |
+
+<Warning>
+  A customer can still send coins after a charge expires. LuminPay keeps watching for an hour after `expiresAt`, and a payment in that time is credited and sends `charge.paid`, so a charge can go from `expired` to `paid`. Handle `charge.paid` even for orders you have cancelled. For a payment after that hour, contact support.
+</Warning>
+
+## Confirm the payment
+
+Use [webhooks](/guides/webhooks): listen for `charge.paid`. If you also poll, `GET /charges/{chargeId}` is the source of truth. Don't trust a status your frontend reports.
+
+## Idempotency
+
+`reference` makes charge creation safe to retry. If you send a `reference` you've already used, LuminPay returns the existing charge instead of creating a second one, with the same addresses.
+
+- References are unique across LuminPay. If another account already uses a reference, you get `409`. Prefix references with something specific to you, for example `acme_order_1001`.
+- Use one reference per payment attempt. To charge the same order again after it expired, use a new reference such as `order_1001_2`.
+
+## List charges
+
+`GET /charges?limit=50&cursor=...` returns `{ "transactions": [...], "nextCursor": "..." }`, newest first. `limit` is at most 100. Pass `nextCursor` back as `cursor` for the next page; it is `null` on the last page.
+
+## Limits
+
+Each account has a daily limit on the naira value of charges:
+
+| Verification | Daily limit |
+|---|---|
+| Identity (NIN, BVN and selfie) | ₦200,000 |
+| Business (CAC documents) | No limit |
+
+A charge that would go over the limit is refused with `403`.
+
+## Refunds
+
+Refunds send the coins back to the customer and need an account owner or admin to approve them with their PIN, so they are made from the dashboard, not with an API key. You receive `refund.completed` when one is sent.

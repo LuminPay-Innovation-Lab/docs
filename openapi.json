@@ -1,1 +1,1325 @@
-{"openapi":"3.0.0","paths":{"/charges":{"post":{"operationId":"ChargesController_createCharge","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateChargeDto"}}}},"responses":{"200":{"description":""}},"summary":"Create a charge","tags":["Charges"]},"get":{"operationId":"ChargesController_listTransactions","parameters":[{"name":"limit","required":true,"in":"query","schema":{"type":"string"}},{"name":"cursor","required":true,"in":"query","schema":{"type":"string"}},{"name":"outletId","required":true,"in":"query","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"summary":"List charges","tags":["Charges"]}},"/charges/{id}/public":{"get":{"operationId":"ChargesController_getPublicCharge","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"summary":"Get a charge (public, no auth required)","tags":["Charges"]}},"/charges/{id}/check-now":{"post":{"operationId":"ChargesController_checkChargeNow","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"summary":"Force an immediate check for payment on a charge","tags":["Charges"]}},"/charges/{id}":{"get":{"operationId":"ChargesController_getCharge","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"summary":"Get a charge","tags":["Charges"]}},"/rates":{"get":{"operationId":"RatesController_getRate","parameters":[],"responses":{"200":{"description":""}},"summary":"Get the current exchange rate","tags":["Rates"]}},"/rates/preview":{"get":{"operationId":"RatesController_preview","parameters":[{"name":"ngn","required":true,"in":"query","schema":{"type":"string"}},{"name":"scale","required":true,"in":"query","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"summary":"Preview a currency conversion","tags":["Rates"]}},"/api-keys":{"post":{"operationId":"ApiKeysController_create","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateApiKeyDto"}}}},"responses":{"201":{"description":""}},"summary":"Create an API key","tags":["API Keys"]},"get":{"operationId":"ApiKeysController_list","parameters":[],"responses":{"200":{"description":""}},"summary":"List API keys","tags":["API Keys"]}},"/api-keys/{id}/revoke":{"patch":{"operationId":"ApiKeysController_revoke","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"summary":"Revoke an API key","tags":["API Keys"]}},"/webhooks-platform/endpoints":{"post":{"operationId":"WebhooksPlatformController_create","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateWebhookEndpointDto"}}}},"responses":{"201":{"description":""}},"summary":"Register a webhook endpoint","tags":["Webhooks"]},"get":{"operationId":"WebhooksPlatformController_list","parameters":[],"responses":{"200":{"description":""}},"summary":"List webhook endpoints","tags":["Webhooks"]}},"/webhooks-platform/endpoints/{id}/status":{"patch":{"operationId":"WebhooksPlatformController_setStatus","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"summary":"Enable or disable a webhook endpoint","tags":["Webhooks"]}},"/webhooks-platform/events":{"get":{"operationId":"WebhooksPlatformController_listEvents","parameters":[{"name":"limit","required":true,"in":"query","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"summary":"List webhook delivery events","tags":["Webhooks"]}},"/charges/{chargeId}/refunds":{"post":{"operationId":"RefundsController_create","parameters":[{"name":"chargeId","required":true,"in":"path","schema":{"type":"string"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateRefundDto"}}}},"responses":{"201":{"description":""}},"summary":"Create a refund for a charge","tags":["Refunds"]},"get":{"operationId":"RefundsController_list","parameters":[{"name":"chargeId","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"summary":"List refunds for a charge","tags":["Refunds"]}},"/payment-links":{"post":{"operationId":"PaymentLinksController_create","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreatePaymentLinkDto"}}}},"responses":{"201":{"description":""}},"summary":"Create a payment link","tags":["Payment Links"]},"get":{"operationId":"PaymentLinksController_list","parameters":[],"responses":{"200":{"description":""}},"summary":"List payment links","tags":["Payment Links"]}},"/payment-links/{id}/charges":{"get":{"operationId":"PaymentLinksController_listCharges","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"summary":"List charges made through a payment link","tags":["Payment Links"]}},"/payment-links/{id}/status":{"patch":{"operationId":"PaymentLinksController_setStatus","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"summary":"Enable or disable a payment link","tags":["Payment Links"]}},"/payment-links/public/{slug}":{"get":{"operationId":"PaymentLinksController_getPublic","parameters":[{"name":"slug","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"summary":"Get a payment link (public, no auth required)","tags":["Payment Links"]}},"/payment-links/public/{slug}/pay":{"post":{"operationId":"PaymentLinksController_pay","parameters":[{"name":"slug","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"201":{"description":""}},"summary":"Pay a payment link (public, no auth required)","tags":["Payment Links"]}},"/invoices":{"post":{"operationId":"InvoicesController_create","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateInvoiceDto"}}}},"responses":{"201":{"description":""}},"summary":"Create an invoice","tags":["Invoices"]},"get":{"operationId":"InvoicesController_list","parameters":[],"responses":{"200":{"description":""}},"summary":"List invoices","tags":["Invoices"]}},"/invoices/{id}":{"get":{"operationId":"InvoicesController_getById","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"summary":"Get an invoice","tags":["Invoices"]}},"/invoices/{id}/void":{"patch":{"operationId":"InvoicesController_voidInvoice","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"summary":"Void an invoice","tags":["Invoices"]}},"/invoices/public/{reference}":{"get":{"operationId":"InvoicesController_getPublic","parameters":[{"name":"reference","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"summary":"Get an invoice (public, no auth required)","tags":["Invoices"]}},"/invoices/public/{reference}/pay":{"post":{"operationId":"InvoicesController_pay","parameters":[{"name":"reference","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"201":{"description":""}},"summary":"Pay an invoice (public, no auth required)","tags":["Invoices"]}},"/wallet/balances":{"get":{"operationId":"WalletController_getBalances","parameters":[],"responses":{"200":{"description":""}},"summary":"Get wallet balances","tags":["Wallet"]}},"/wallet/estimated-balance":{"get":{"operationId":"WalletController_getEstimatedBalance","parameters":[],"responses":{"200":{"description":""}},"summary":"Get estimated wallet balance in NGN","tags":["Wallet"]}},"/payouts":{"post":{"operationId":"PayoutsController_requestPayout","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/RequestPayoutDto"}}}},"responses":{"201":{"description":""}},"summary":"Request a payout","tags":["Payouts"]},"get":{"operationId":"PayoutsController_list","parameters":[{"name":"limit","required":true,"in":"query","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"summary":"List payouts","tags":["Payouts"]}},"/payouts/schedule":{"get":{"operationId":"PayoutsController_getSchedule","parameters":[],"responses":{"200":{"description":""}},"summary":"Get payout schedule","tags":["Payouts"]},"post":{"operationId":"PayoutsController_updateSchedule","parameters":[],"responses":{"201":{"description":""}},"summary":"Update payout schedule","tags":["Payouts"]}},"/outlets":{"post":{"operationId":"OutletsController_create","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateOutletDto"}}}},"responses":{"201":{"description":""}},"summary":"Create an outlet","tags":["Outlets"]},"get":{"operationId":"OutletsController_list","parameters":[],"responses":{"200":{"description":""}},"summary":"List outlets","tags":["Outlets"]}},"/outlets/{id}/status":{"patch":{"operationId":"OutletsController_setStatus","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"summary":"Enable or disable an outlet","tags":["Outlets"]}},"/lightning/charges/{chargeId}":{"get":{"operationId":"LightningController_get","parameters":[{"name":"chargeId","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"summary":"Get a Lightning charge","tags":["Lightning"]}}},"info":{"title":"LuminPay API","description":"Stablecoin merchant payments.","version":"0.1","contact":{}},"tags":[],"servers":[],"components":{"securitySchemes":{"bearer":{"scheme":"bearer","bearerFormat":"JWT","type":"http"}},"schemas":{"CreateChargeDto":{"type":"object","properties":{}},"CreateApiKeyDto":{"type":"object","properties":{}},"CreateWebhookEndpointDto":{"type":"object","properties":{}},"CreateRefundDto":{"type":"object","properties":{}},"CreatePaymentLinkDto":{"type":"object","properties":{}},"CreateInvoiceDto":{"type":"object","properties":{}},"RequestPayoutDto":{"type":"object","properties":{}},"CreateOutletDto":{"type":"object","properties":{}}}}}
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "LuminPay API",
+    "version": "1.0.0",
+    "description": "Accept stablecoin and Bitcoin payments and settle in naira. Use a lmp_test_ key with the Sandbox server and a lmp_live_ key with the Live server."
+  },
+  "servers": [
+    {
+      "url": "https://sandbox-api.luminpay.co",
+      "description": "Sandbox (testnet)"
+    },
+    {
+      "url": "https://api.luminpay.co",
+      "description": "Live"
+    }
+  ],
+  "security": [
+    {
+      "apiKey": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Charges"
+    },
+    {
+      "name": "Webhooks"
+    },
+    {
+      "name": "Payment links"
+    },
+    {
+      "name": "Invoices"
+    }
+  ],
+  "paths": {
+    "/charges": {
+      "post": {
+        "tags": [
+          "Charges"
+        ],
+        "summary": "Create a charge",
+        "operationId": "createCharge",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateChargeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The charge. Addresses are added a few seconds later.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Charge"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/E400"
+          },
+          "401": {
+            "$ref": "#/components/responses/E401"
+          },
+          "403": {
+            "$ref": "#/components/responses/E403"
+          },
+          "404": {
+            "$ref": "#/components/responses/E404"
+          },
+          "409": {
+            "$ref": "#/components/responses/E409"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Charges"
+        ],
+        "summary": "List charges",
+        "operationId": "listCharges",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "outletId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Newest first",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChargeList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/E400"
+          },
+          "401": {
+            "$ref": "#/components/responses/E401"
+          },
+          "403": {
+            "$ref": "#/components/responses/E403"
+          },
+          "404": {
+            "$ref": "#/components/responses/E404"
+          }
+        }
+      }
+    },
+    "/charges/{id}": {
+      "get": {
+        "tags": [
+          "Charges"
+        ],
+        "summary": "Get a charge",
+        "operationId": "getCharge",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The charge",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Charge"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/E400"
+          },
+          "401": {
+            "$ref": "#/components/responses/E401"
+          },
+          "403": {
+            "$ref": "#/components/responses/E403"
+          },
+          "404": {
+            "$ref": "#/components/responses/E404"
+          }
+        }
+      }
+    },
+    "/webhooks-platform/endpoints": {
+      "post": {
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "Add a webhook endpoint",
+        "operationId": "createWebhookEndpoint",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWebhookEndpointRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The endpoint, with its signing secret",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookEndpoint"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/E400"
+          },
+          "401": {
+            "$ref": "#/components/responses/E401"
+          },
+          "403": {
+            "$ref": "#/components/responses/E403"
+          },
+          "404": {
+            "$ref": "#/components/responses/E404"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "List webhook endpoints",
+        "operationId": "listWebhookEndpoints",
+        "responses": {
+          "200": {
+            "description": "Endpoints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WebhookEndpoint"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/E400"
+          },
+          "401": {
+            "$ref": "#/components/responses/E401"
+          },
+          "403": {
+            "$ref": "#/components/responses/E403"
+          },
+          "404": {
+            "$ref": "#/components/responses/E404"
+          }
+        }
+      }
+    },
+    "/webhooks-platform/endpoints/{id}/status": {
+      "patch": {
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "Turn an endpoint on or off",
+        "operationId": "setWebhookEndpointStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": ""
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetWebhookStatusRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The endpoint",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookEndpoint"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/E400"
+          },
+          "401": {
+            "$ref": "#/components/responses/E401"
+          },
+          "403": {
+            "$ref": "#/components/responses/E403"
+          },
+          "404": {
+            "$ref": "#/components/responses/E404"
+          }
+        }
+      }
+    },
+    "/webhooks-platform/endpoints/{id}/test": {
+      "post": {
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "Send a test event",
+        "operationId": "sendWebhookTest",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": ""
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The delivery, with your endpoint's response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookDelivery"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/E400"
+          },
+          "401": {
+            "$ref": "#/components/responses/E401"
+          },
+          "403": {
+            "$ref": "#/components/responses/E403"
+          },
+          "404": {
+            "$ref": "#/components/responses/E404"
+          }
+        }
+      }
+    },
+    "/webhooks-platform/events": {
+      "get": {
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "List webhook deliveries",
+        "operationId": "listWebhookDeliveries",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Newest first",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WebhookDelivery"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/E400"
+          },
+          "401": {
+            "$ref": "#/components/responses/E401"
+          },
+          "403": {
+            "$ref": "#/components/responses/E403"
+          },
+          "404": {
+            "$ref": "#/components/responses/E404"
+          }
+        }
+      }
+    },
+    "/payment-links": {
+      "post": {
+        "tags": [
+          "Payment links"
+        ],
+        "summary": "Create a payment link",
+        "operationId": "createPaymentLink",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePaymentLinkRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The payment link",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentLink"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/E400"
+          },
+          "401": {
+            "$ref": "#/components/responses/E401"
+          },
+          "403": {
+            "$ref": "#/components/responses/E403"
+          },
+          "404": {
+            "$ref": "#/components/responses/E404"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Payment links"
+        ],
+        "summary": "List payment links",
+        "operationId": "listPaymentLinks",
+        "responses": {
+          "200": {
+            "description": "Payment links",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PaymentLink"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/E400"
+          },
+          "401": {
+            "$ref": "#/components/responses/E401"
+          },
+          "403": {
+            "$ref": "#/components/responses/E403"
+          },
+          "404": {
+            "$ref": "#/components/responses/E404"
+          }
+        }
+      }
+    },
+    "/payment-links/{id}": {
+      "get": {
+        "tags": [
+          "Payment links"
+        ],
+        "summary": "Get a payment link",
+        "operationId": "getPaymentLink",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The payment link",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentLink"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/E400"
+          },
+          "401": {
+            "$ref": "#/components/responses/E401"
+          },
+          "403": {
+            "$ref": "#/components/responses/E403"
+          },
+          "404": {
+            "$ref": "#/components/responses/E404"
+          }
+        }
+      }
+    },
+    "/payment-links/{id}/charges": {
+      "get": {
+        "tags": [
+          "Payment links"
+        ],
+        "summary": "List charges made through a payment link",
+        "operationId": "listPaymentLinkCharges",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Charges",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/E400"
+          },
+          "401": {
+            "$ref": "#/components/responses/E401"
+          },
+          "403": {
+            "$ref": "#/components/responses/E403"
+          },
+          "404": {
+            "$ref": "#/components/responses/E404"
+          }
+        }
+      }
+    },
+    "/payment-links/{id}/status": {
+      "patch": {
+        "tags": [
+          "Payment links"
+        ],
+        "summary": "Turn a payment link on or off",
+        "operationId": "setPaymentLinkStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": ""
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetPaymentLinkStatusRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The payment link",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentLink"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/E400"
+          },
+          "401": {
+            "$ref": "#/components/responses/E401"
+          },
+          "403": {
+            "$ref": "#/components/responses/E403"
+          },
+          "404": {
+            "$ref": "#/components/responses/E404"
+          }
+        }
+      }
+    },
+    "/invoices": {
+      "post": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "Create an invoice",
+        "operationId": "createInvoice",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateInvoiceRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The invoice",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Invoice"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/E400"
+          },
+          "401": {
+            "$ref": "#/components/responses/E401"
+          },
+          "403": {
+            "$ref": "#/components/responses/E403"
+          },
+          "404": {
+            "$ref": "#/components/responses/E404"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "List invoices",
+        "operationId": "listInvoices",
+        "responses": {
+          "200": {
+            "description": "Invoices",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Invoice"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/E400"
+          },
+          "401": {
+            "$ref": "#/components/responses/E401"
+          },
+          "403": {
+            "$ref": "#/components/responses/E403"
+          },
+          "404": {
+            "$ref": "#/components/responses/E404"
+          }
+        }
+      }
+    },
+    "/invoices/{id}": {
+      "get": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "Get an invoice",
+        "operationId": "getInvoice",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The invoice",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Invoice"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/E400"
+          },
+          "401": {
+            "$ref": "#/components/responses/E401"
+          },
+          "403": {
+            "$ref": "#/components/responses/E403"
+          },
+          "404": {
+            "$ref": "#/components/responses/E404"
+          }
+        }
+      }
+    },
+    "/invoices/{id}/void": {
+      "patch": {
+        "tags": [
+          "Invoices"
+        ],
+        "summary": "Void an invoice",
+        "operationId": "voidInvoice",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The invoice",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Invoice"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/E400"
+          },
+          "401": {
+            "$ref": "#/components/responses/E401"
+          },
+          "403": {
+            "$ref": "#/components/responses/E403"
+          },
+          "404": {
+            "$ref": "#/components/responses/E404"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "apiKey": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "lmp_test_... or lmp_live_...",
+        "description": "Your secret API key from Developers → API keys."
+      }
+    },
+    "schemas": {
+      "CreateChargeRequest": {
+        "type": "object",
+        "required": [
+          "asset"
+        ],
+        "properties": {
+          "asset": {
+            "type": "string",
+            "description": "Coin to quote in. See Networks.",
+            "example": "USDT_BSC_MAINNET",
+            "enum": [
+              "USDT_BSC_MAINNET",
+              "USDT_TRON_MAINNET",
+              "USDT_SOLANA_MAINNET",
+              "USDC_ETH_MAINNET",
+              "USDC_SOLANA_MAINNET",
+              "BTC_MAINNET",
+              "USDC_ETH_TEST5_AN74",
+              "USDT_BSC_TEST",
+              "USDC_SOLANA_DEVNET",
+              "BTC_TEST"
+            ]
+          },
+          "amountNgn": {
+            "type": "string",
+            "pattern": "^[1-9]\\d{0,11}$",
+            "description": "Whole naira, digits only. Send this or amount.",
+            "example": "25000"
+          },
+          "amount": {
+            "type": "string",
+            "pattern": "^[1-9]\\d{0,17}$",
+            "description": "Coin amount in its smallest unit. Send this or amountNgn."
+          },
+          "reference": {
+            "type": "string",
+            "description": "Your id for this payment. Reusing it returns the same charge.",
+            "example": "acme_order_1001"
+          }
+        }
+      },
+      "PaymentAddress": {
+        "type": "object",
+        "properties": {
+          "asset": {
+            "type": "string"
+          },
+          "chain": {
+            "type": "string",
+            "example": "bsc_mainnet"
+          },
+          "address": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "string",
+            "description": "Smallest unit"
+          },
+          "scale": {
+            "type": "integer",
+            "description": "Decimals",
+            "example": 18
+          }
+        }
+      },
+      "Charge": {
+        "type": "object",
+        "properties": {
+          "chargeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "paid",
+              "underpaid",
+              "expired",
+              "failed",
+              "cancelled"
+            ]
+          },
+          "asset": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "string",
+            "description": "What the customer pays, smallest unit, fee included"
+          },
+          "feeAmount": {
+            "type": "string",
+            "description": "LuminPay fee inside amount"
+          },
+          "amountNgn": {
+            "type": "string",
+            "nullable": true,
+            "description": "Naira amount in kobo"
+          },
+          "rate": {
+            "type": "string",
+            "nullable": true,
+            "description": "Naira per US dollar"
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "addresses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentAddress"
+            }
+          },
+          "txHash": {
+            "type": "string",
+            "nullable": true
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ChargeList": {
+        "type": "object",
+        "properties": {
+          "transactions": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "nextCursor": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "CreateWebhookEndpointRequest": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "example": "https://example.com/webhooks/luminpay"
+          }
+        }
+      },
+      "WebhookEndpoint": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "url": {
+            "type": "string"
+          },
+          "signingSecret": {
+            "type": "string",
+            "example": "whsec_..."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "disabled"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "SetWebhookStatusRequest": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "disabled"
+            ]
+          }
+        }
+      },
+      "WebhookDelivery": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "eventType": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "delivered",
+              "failed"
+            ]
+          },
+          "attempts": {
+            "type": "integer"
+          },
+          "responseStatus": {
+            "type": "integer",
+            "nullable": true
+          },
+          "responseBody": {
+            "type": "string",
+            "nullable": true
+          },
+          "nextRetryAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "deliveredAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "payload": {
+            "type": "object"
+          }
+        }
+      },
+      "CreatePaymentLinkRequest": {
+        "type": "object",
+        "required": [
+          "title",
+          "amountType"
+        ],
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "amountType": {
+            "type": "string",
+            "enum": [
+              "fixed",
+              "flexible"
+            ]
+          },
+          "fixedAmountNgn": {
+            "type": "string",
+            "pattern": "^[1-9]\\d{0,11}$",
+            "description": "Whole naira, e.g. \"5000\" for ₦5,000. Required when amountType is fixed."
+          },
+          "successRedirectUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Where to send the customer after paying. https on Live."
+          }
+        }
+      },
+      "SetPaymentLinkStatusRequest": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "inactive"
+            ]
+          }
+        }
+      },
+      "PaymentLink": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Share this with customers"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "amountType": {
+            "type": "string",
+            "enum": [
+              "fixed",
+              "flexible"
+            ]
+          },
+          "fixedAmountNgn": {
+            "type": "string",
+            "nullable": true,
+            "description": "Kobo"
+          },
+          "successRedirectUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "inactive"
+            ]
+          },
+          "paymentCount": {
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Invoice": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reference": {
+            "type": "string",
+            "example": "INV-1A2B3C4D"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Share this with the customer"
+          },
+          "customerName": {
+            "type": "string"
+          },
+          "customerEmail": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "amountNgn": {
+            "type": "string",
+            "description": "Kobo"
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "sent",
+              "paid",
+              "void"
+            ]
+          },
+          "chargeId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "paidAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "CreateInvoiceRequest": {
+        "type": "object",
+        "required": [
+          "customerName",
+          "amountNgn"
+        ],
+        "properties": {
+          "customerName": {
+            "type": "string"
+          },
+          "customerEmail": {
+            "type": "string",
+            "format": "email"
+          },
+          "description": {
+            "type": "string"
+          },
+          "amountNgn": {
+            "type": "string",
+            "pattern": "^[1-9]\\d{0,11}$",
+            "description": "Whole naira, e.g. \"25000\" for ₦25,000"
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "integer"
+          },
+          "message": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            ]
+          },
+          "error": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "responses": {
+      "E400": {
+        "description": "Invalid request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "E401": {
+        "description": "Missing, invalid or wrong-environment key",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "E403": {
+        "description": "Not allowed: verification, daily limit, or key management with an API key",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "E404": {
+        "description": "Not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "E409": {
+        "description": "Reference already used by another account",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      }
+    }
+  }
+}
