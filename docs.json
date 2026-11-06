@@ -26,6 +26,7 @@
             "group": "Guides",
             "pages": [
               "guides/payments",
+              "guides/payment-links-and-invoices",
               "guides/webhooks",
               "guides/networks",
               "guides/errors",

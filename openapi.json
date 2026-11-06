@@ -430,7 +430,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "$ref": "#/components/schemas/PaymentLink"
                 }
               }
             }
@@ -463,8 +463,53 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "object"
+                    "$ref": "#/components/schemas/PaymentLink"
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/E400"
+          },
+          "401": {
+            "$ref": "#/components/responses/E401"
+          },
+          "403": {
+            "$ref": "#/components/responses/E403"
+          },
+          "404": {
+            "$ref": "#/components/responses/E404"
+          }
+        }
+      }
+    },
+    "/payment-links/{id}": {
+      "get": {
+        "tags": [
+          "Payment links"
+        ],
+        "summary": "Get a payment link",
+        "operationId": "getPaymentLink",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The payment link",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentLink"
                 }
               }
             }
@@ -567,7 +612,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "$ref": "#/components/schemas/PaymentLink"
                 }
               }
             }
@@ -610,7 +655,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "$ref": "#/components/schemas/Invoice"
                 }
               }
             }
@@ -643,7 +688,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "object"
+                    "$ref": "#/components/schemas/Invoice"
                   }
                 }
               }
@@ -689,7 +734,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "$ref": "#/components/schemas/Invoice"
                 }
               }
             }
@@ -734,7 +779,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "$ref": "#/components/schemas/Invoice"
                 }
               }
             }
@@ -1030,11 +1075,12 @@
           "fixedAmountNgn": {
             "type": "string",
             "pattern": "^[1-9]\\d{0,11}$",
-            "description": "Whole naira; required when amountType is fixed"
+            "description": "Whole naira, e.g. \"5000\" for ₦5,000. Required when amountType is fixed."
           },
           "successRedirectUrl": {
             "type": "string",
-            "format": "uri"
+            "format": "uri",
+            "description": "Where to send the customer after paying. https on Live."
           }
         }
       },
@@ -1050,6 +1096,120 @@
               "active",
               "inactive"
             ]
+          }
+        }
+      },
+      "PaymentLink": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Share this with customers"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "amountType": {
+            "type": "string",
+            "enum": [
+              "fixed",
+              "flexible"
+            ]
+          },
+          "fixedAmountNgn": {
+            "type": "string",
+            "nullable": true,
+            "description": "Kobo"
+          },
+          "successRedirectUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "inactive"
+            ]
+          },
+          "paymentCount": {
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Invoice": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reference": {
+            "type": "string",
+            "example": "INV-1A2B3C4D"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Share this with the customer"
+          },
+          "customerName": {
+            "type": "string"
+          },
+          "customerEmail": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "amountNgn": {
+            "type": "string",
+            "description": "Kobo"
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "sent",
+              "paid",
+              "void"
+            ]
+          },
+          "chargeId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "paidAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
           }
         }
       },
@@ -1073,7 +1233,7 @@
           "amountNgn": {
             "type": "string",
             "pattern": "^[1-9]\\d{0,11}$",
-            "description": "Whole naira"
+            "description": "Whole naira, e.g. \"25000\" for ₦25,000"
           },
           "dueDate": {
             "type": "string",

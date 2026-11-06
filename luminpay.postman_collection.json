@@ -315,6 +315,24 @@
           }
         },
         {
+          "name": "Get a payment link",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/payment-links/{{id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payment-links",
+                "{{id}}"
+              ]
+            },
+            "description": "Get a payment link"
+          }
+        },
+        {
           "name": "List charges made through a payment link",
           "request": {
             "method": "GET",

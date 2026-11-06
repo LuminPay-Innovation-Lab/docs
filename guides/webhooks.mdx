@@ -42,7 +42,7 @@ This delivers a signed `webhook.test` event straight away and returns the delive
 | `refund.completed` | A refund has been sent to the customer. | `refundId`, `chargeId`, `amount`, `asset` |
 | `webhook.test` | You sent a test event. | `message` |
 
-Charge fields: `chargeId`, `reference`, `status`, `amount` (what arrived, in the smallest unit of `asset`), `asset` (the coin the customer paid with) and `amountNgn` (kobo, or `null`).
+Charge fields: `chargeId`, `reference`, `status`, `amount` (what arrived, in the smallest unit of `asset`), `asset` (the coin the customer paid with), `amountNgn` (kobo, or `null`), and `paymentLinkId` and `invoiceId` (or `null`) when the payment came through a payment link or invoice.
 
 <Note>
   `charge.expired` can be followed by `charge.paid` for the same charge if the customer pays late. See [Statuses](/guides/payments#statuses).
@@ -71,7 +71,9 @@ X-LuminPay-Signature: t=1762423200,v1=5257a869e7ecebeda32affa62cdca3fa51cad7e77a
     "status": "paid",
     "amount": "18050000",
     "asset": "USDT_BSC_MAINNET",
-    "amountNgn": "2500000"
+    "amountNgn": "2500000",
+    "paymentLinkId": null,
+    "invoiceId": null
   }
 }
 ```
