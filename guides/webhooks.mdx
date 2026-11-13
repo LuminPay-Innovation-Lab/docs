@@ -38,6 +38,8 @@ This delivers a signed `webhook.test` event straight away and returns the delive
 | `charge.paid` | A charge is paid in full (at least 99% of `amount`). | Charge fields below |
 | `charge.underpaid` | The customer sent less than 99% of `amount`. | Charge fields below |
 | `charge.expired` | A charge's 15 minutes ran out with no payment. | Charge fields below |
+| `charge.on_hold` | The payment arrived but is held for a compliance check. Don't release goods yet. | Charge fields below |
+| `charge.failed` | A held payment was rejected after the check. | Charge fields below |
 | `invoice.paid` | An invoice is paid. | `invoiceId`, `reference`, `amountNgn` (kobo), `customerName` |
 | `refund.completed` | A refund has been sent to the customer. | `refundId`, `chargeId`, `amount`, `asset` |
 | `webhook.test` | You sent a test event. | `message` |
@@ -46,6 +48,7 @@ Charge fields: `chargeId`, `reference`, `status`, `amount` (what arrived, in the
 
 <Note>
   `charge.expired` can be followed by `charge.paid` for the same charge if the customer pays late. See [Statuses](/guides/payments#statuses).
+  `charge.on_hold` is followed by `charge.paid` (or `charge.underpaid`) if the check clears, or `charge.failed` if it doesn't.
 </Note>
 
 ## What a delivery looks like
