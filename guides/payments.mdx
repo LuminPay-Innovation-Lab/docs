@@ -62,6 +62,7 @@ You have two options:
 | `pending` | Waiting for the customer to pay. | Wait. |
 | `paid` | Paid in full. A payment of at least 99% of `amount` counts as paid. | Fulfil the order. |
 | `underpaid` | The customer sent less than 99%. | Contact the customer. Your dashboard shows what arrived. |
+| `on_hold` | The payment arrived, but LuminPay is checking the paying wallet before it reaches your balance. | Don't release goods yet. It becomes `paid` (or `underpaid`) or `failed` once the check is done. |
 | `expired` | Nobody paid within 15 minutes. | Create a new charge if the customer still wants to pay. |
 | `failed`, `cancelled` | The charge can't be paid. | Create a new charge. |
 
