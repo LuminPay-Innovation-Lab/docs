@@ -35,8 +35,8 @@ This delivers a signed `webhook.test` event straight away and returns the delive
 
 | Type | Sent when | `data` |
 |---|---|---|
-| `charge.paid` | A charge is paid in full (at least 99% of `amount`). | Charge fields below |
-| `charge.underpaid` | The customer sent less than 99% of `amount`. | Charge fields below |
+| `charge.paid` | A charge is paid in full (the payments so far add up to at least 99% of the amount due), or a merchant accepted a part-payment as the full payment. | Charge fields below |
+| `charge.underpaid` | The customer has sent less than 99% of the amount due so far. Sent once for each part-payment. | Charge fields below, plus the part-payment fields |
 | `charge.expired` | A charge's 15 minutes ran out with no payment. | Charge fields below |
 | `charge.on_hold` | The payment arrived but is held for a compliance check. Don't release goods yet. | Charge fields below |
 | `charge.failed` | A held payment was rejected after the check. | Charge fields below |
@@ -46,7 +46,10 @@ This delivers a signed `webhook.test` event straight away and returns the delive
 
 Charge fields: `chargeId`, `reference`, `status`, `amount` (what arrived, in the smallest unit of `asset`), `asset` (the coin the customer paid with), `amountNgn` (kobo, or `null`), and `paymentLinkId` and `invoiceId` (or `null`) when the payment came through a payment link or invoice.
 
+Part-payment fields (on `charge.underpaid` and `charge.paid`): `amountDue` (the amount the customer was asked to pay), `amountReceived` (everything that has arrived so far), `amountRemaining`, `topUpUntil` (until when the customer can send the rest to the same address, or `null`), and `partialPayments` (how many payments so far). All amounts are in the smallest unit of `asset`. When a merchant accepted a short payment as the full payment, `charge.paid` also carries `acceptedShort: true` and `acceptedShortReason`.
+
 <Note>
+  A part-paid charge stays open: the customer can send the rest to the same address until `topUpUntil`, and the merchant can give more time. When the payments add up, you get `charge.paid`. Don't release goods on `charge.underpaid`.
   `charge.expired` can be followed by `charge.paid` for the same charge if the customer pays late. See [Statuses](/guides/payments#statuses).
   `charge.on_hold` is followed by `charge.paid` (or `charge.underpaid`) if the check clears, or `charge.failed` if it doesn't.
 </Note>
