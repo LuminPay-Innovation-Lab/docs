@@ -1,0 +1,39 @@
+---
+title: "Idempotency"
+description: "Retry create requests safely with the Idempotency-Key header"
+---
+
+A network error leaves you not knowing whether a request worked. If you simply send it again, you might create a second charge, refund or payout. Send an `Idempotency-Key` header and a retry returns the first answer instead of doing the work twice.
+
+```bash
+curl https://sandbox-api.luminpay.co/charges \
+  -H "Authorization: Bearer lmp_test_..." \
+  -H "Idempotency-Key: order_1001_attempt_1" \
+  -H "Content-Type: application/json" \
+  -d '{ "amountNgn": "500000", "asset": "USDC_ETH_MAINNET" }'
+```
+
+## Which requests
+
+Creating a charge, a refund, a payout, a transfer, an invoice, a payment link or a subscription. The header is optional. Without it nothing changes.
+
+## The rules
+
+- The key is 8 to 64 characters: letters, numbers, dots, dashes, underscores and colons. Use a new random value, or one built from your own id such as `order_1001_attempt_1`.
+- **First request:** runs normally. Its answer is saved for 24 hours.
+- **Same key, same request:** returns the saved answer with the header `Idempotent-Replayed: true`. Nothing is created again.
+- **Same key, different request:** refused with `422`. A key stands for one request. Use a new key for a different one.
+- **Same key while the first is still running:** refused with `409`. Wait a moment and try again.
+- **A request that failed** is forgotten, so retrying with the same key runs it again.
+- Keys belong to the account (and business) that sent them. Two accounts can use the same key without affecting each other.
+
+<Tip>
+  For charges you can also use `reference`, your own order id. See [Payments](/guides/payments#idempotency). Use `Idempotency-Key` as well for refunds and payouts, which have no reference.
+</Tip>
+
+## Retrying
+
+1. Send the request with a key and save the key with your order.
+2. If you get a timeout or a `5xx`, send the same request with the same key.
+3. If you get `409`, wait a second and retry.
+4. If you get `422`, you reused a key for a different request. Fix your code; do not just retry.

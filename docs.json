@@ -28,6 +28,7 @@
               "guides/payments",
               "guides/payment-links-and-invoices",
               "guides/webhooks",
+              "guides/idempotency",
               "guides/networks",
               "guides/errors",
               "guides/postman"
