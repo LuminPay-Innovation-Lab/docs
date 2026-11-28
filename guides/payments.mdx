@@ -79,6 +79,7 @@ Use [webhooks](/guides/webhooks): listen for `charge.paid`. If you also poll, `G
 `reference` makes charge creation safe to retry. If you send a `reference` you've already used, LuminPay returns the existing charge instead of creating a second one, with the same addresses.
 
 - References are unique across LuminPay. If another account already uses a reference, you get `409`. Prefix references with something specific to you, for example `acme_order_1001`.
+- For safe retries of any create request, also see [Idempotency](/guides/idempotency).
 - Use one reference per payment attempt. To charge the same order again after it expired, use a new reference such as `order_1001_2`.
 
 ## List charges
@@ -91,7 +92,7 @@ Each account has a daily limit on the naira value of charges:
 
 | Verification | Daily limit |
 |---|---|
-| Identity (NIN, BVN and selfie) | ₦200,000 |
+| Identity (NIN, BVN and selfie) | ₦500,000 |
 | Business (CAC documents) | No limit |
 
 A charge that would go over the limit is refused with `403`.

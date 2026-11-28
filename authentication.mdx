@@ -23,6 +23,26 @@ Create and revoke keys in your dashboard under **Developers → API keys**. For 
 - Revoked keys stop working immediately.
 - To rotate a key, create the new one, deploy it, then revoke the old one.
 
+## Limit what a key can do
+
+When you create a key you can limit it. A limit is checked on every request, and a request outside it is refused.
+
+| Limit | Effect |
+|---|---|
+| **Read only** | The key can only read (`GET`). It cannot create or change anything. Use it for reporting and dashboards. |
+| **Allowed IP addresses** | The key only works from the addresses you list: a single address, or an IPv4 range such as `197.210.0.0/16`. Use your server's fixed address. |
+| **Expiry** | The key stops working on the date you choose. Use it for keys you hand to a contractor or a short project. |
+
+Set the limits in your dashboard under **Developers → API keys**. A refused request returns `401` or `403` with a message such as:
+
+- `This API key can only be used from its allowed IP addresses.`
+- `This API key is read-only. It cannot create or change anything.`
+- `This API key has expired. Create a new key in the dashboard.`
+
+<Tip>
+  Give each system its own key with the smallest limits that work: a reporting tool gets a read-only key, and your payment server gets a key locked to its IP address.
+</Tip>
+
 <Warning>
   Your API key can create charges and read your payments. Keep it on your server. Never put it in a website, mobile app, or public repository. If a key leaks, revoke it straight away.
 </Warning>
