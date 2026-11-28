@@ -1,0 +1,53 @@
+---
+title: "Payouts"
+description: "How naira reaches your bank account, and how to request an instant payout"
+---
+
+Customers pay in crypto and you are credited the naira price you set. Your naira balance is paid out to your **verified bank account**. Payouts go only to a bank account in your own verified name.
+
+## Automatic payouts
+
+By default LuminPay pays out for free once a day when your balance reaches the daily minimum. You can choose **manual**, **daily** or **weekly** in the dashboard, or with `POST /payouts/schedule`.
+
+```bash
+curl https://sandbox-api.luminpay.co/payouts/rules \
+  -H "Authorization: Bearer lmp_test_..."
+```
+
+`GET /payouts/rules` returns the current terms: the daily minimum, the smaller-balance day, and what an instant payout costs. Amounts are in naira.
+
+## Instant payouts
+
+`POST /payouts` sends your available balance now.
+
+```bash
+curl https://sandbox-api.luminpay.co/payouts \
+  -H "Authorization: Bearer lmp_test_..." \
+  -H "Idempotency-Key: payout_2026_11_28_a" \
+  -H "Content-Type: application/json" \
+  -d '{ "amountNgn": 50000 }'
+```
+
+- `amountNgn` is whole naira. Leave it out to pay out everything available.
+- An instant payout has a fee (a percentage with a minimum and a maximum, shown by `GET /payouts/rules`). The automatic payout is free.
+- Send an [Idempotency-Key](/guides/idempotency) so a retry cannot pay out twice.
+- Only one payout can be in progress at a time. A second request returns `403` until the first finishes.
+- A large payout can need a **second approval** before it is sent (status `awaiting_approval`).
+- An unusual payout (much larger than usual, or after a sign-in from a new country) needs the owner's selfie first. The request returns `403` with code `SELFIE_REQUIRED`.
+
+## Payout statuses
+
+| Status | Meaning |
+|---|---|
+| `awaiting_approval` | A large payout waiting for a second approval. |
+| `pending` | Accepted and queued. |
+| `processing` | Being sent to the bank. |
+| `completed` | Your bank has the money. |
+| `failed` | It did not go through. Your balance is not reduced. |
+| `reversed` | The bank returned it. The amount is back in your balance. |
+
+`GET /payouts` lists your payouts, newest first (`limit` up to 100). Each shows the naira sent, the fee, the status and the times.
+
+<Note>
+  A payout is not a bank statement. If you reconcile against your bank, match on the payout `reference`.
+</Note>

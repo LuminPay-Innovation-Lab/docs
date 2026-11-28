@@ -1,0 +1,65 @@
+---
+title: "Refunds"
+description: "How refunds work, the rate rule, approvals and holds"
+---
+
+A crypto payment cannot be reversed. A refund is a **new payment back to the wallet that paid**, in the same coin. You refund your own customers; LuminPay staff are not part of the normal path.
+
+<Note>
+  Creating, approving or cancelling a refund needs a **signed-in dashboard session** and the person's own PIN. It is not a server-to-server call with an API key. Refund from the dashboard (**Transactions**, then **Refund**) or at the till.
+</Note>
+
+## The rules
+
+- A refund goes only to the wallet that paid. It cannot be redirected.
+- It cannot be more than what is left of the sale.
+- **LuminPay's fee is not refunded.**
+- **LuminPay pays the network fee.** It is not taken from you or from your customer.
+- It is paid from your available balance. If the sale was already paid out to your bank, the refund waits until your balance covers it.
+
+## The rate rule
+
+The customer **never receives more coins than they paid**. The rule is about how far the rate has moved, not how much time has passed.
+
+| What happened to the rate since the sale | Coins sent |
+|---|---|
+| Moved 1% or less, either way | Exactly the coins paid |
+| Naira stronger by more than 1% | Exactly the coins paid, never more |
+| Naira weaker by more than 1% | The naira price in coins at today's rate, which is fewer coins |
+
+Either way you are debited the naira you were credited for that part of the sale.
+
+**Example.** A customer paid 100 USDT for ₦150,000 at a market rate of ₦1,500.
+
+| Rate at refund | Customer receives | You are debited |
+|---|---|---|
+| ₦1,506 (+0.4%) | 100 USDT | ₦150,000 |
+| ₦1,530 (+2.0%) | 98.04 USDT | ₦150,000 |
+| ₦1,475 (−1.7%) | 100 USDT | ₦150,000 |
+
+## Quote first
+
+`GET /charges/{chargeId}/refunds/quote?amount=...` shows how many coins will be sent and why. A quote is valid for 5 minutes. Send the quoted `sendAmount` back as `expectedSendAmount` when you create the refund. If the rate moved and the amount would change, the request is refused with `409` and code `REFUND_QUOTE_CHANGED`, with the new amount, so nobody is sent a different amount than they agreed.
+
+## Large refunds and holds
+
+- A refund above your **approval limit** (₦250,000 until you change it) needs a **second owner or admin** of your business to approve it with their own PIN. Nobody approves their own request. A business with one person is not forced to wait for anyone.
+- You can **hold** every refund for 15 minutes, 1 hour, 4 hours or 24 hours before it is sent. We email your owners and admins, and you can cancel until it goes.
+- Set both under **Refunds** in the dashboard, or with `POST /refund-settings`.
+
+## Reading a refund
+
+| Field | Meaning |
+|---|---|
+| `status` | `pending`, `processing`, `completed` or `failed`. |
+| `merchantApprovalStatus` | `pending` means a second person must approve it. Also `approved`, `rejected`, `cancelled`, `not_required`. |
+| `scheduledFor` | When a hold ends and the refund is sent. |
+| `amount` / `sendAmount` | Coins the sale is reduced by, and the coins actually sent (never more). |
+| `rateBasis`, `moveBps` | `original`, `current` or `capped`, and how far the rate moved in basis points. |
+| `merchantDebitKobo` | The naira taken from your balance, in kobo. |
+
+A refund that is `pending` with an approval or a hold is **not a failure and nothing has been sent**. Do not show it to your customer as failed.
+
+## Failures
+
+If a refund fails after it may have reached the network, LuminPay does not send it again until a person has checked the blockchain and confirmed that nothing was sent. This stops a customer being refunded twice.
