@@ -77,8 +77,16 @@
           },
           "409": {
             "$ref": "#/components/responses/E409"
+          },
+          "422": {
+            "$ref": "#/components/responses/IdempotencyMismatch"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ]
       },
       "get": {
         "tags": [
@@ -446,8 +454,19 @@
           },
           "404": {
             "$ref": "#/components/responses/E404"
+          },
+          "409": {
+            "$ref": "#/components/responses/IdempotencyConflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/IdempotencyMismatch"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ]
       },
       "get": {
         "tags": [
@@ -671,8 +690,19 @@
           },
           "404": {
             "$ref": "#/components/responses/E404"
+          },
+          "409": {
+            "$ref": "#/components/responses/IdempotencyConflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/IdempotencyMismatch"
           }
-        }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ]
       },
       "get": {
         "tags": [
@@ -806,7 +836,7 @@
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "lmp_test_... or lmp_live_...",
-        "description": "Your secret API key from Developers → API keys."
+        "description": "Your secret API key from Developers → API keys. A key can be limited in the dashboard: read only (GET requests only), allowed IP addresses, and an expiry date. A request outside a limit is refused with 401 or 403 and a message saying which limit."
       }
     },
     "schemas": {
@@ -1319,6 +1349,67 @@
             }
           }
         }
+      },
+      "IdempotencyConflict": {
+        "description": "A request with this Idempotency-Key is still being processed. Wait a moment and retry.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "statusCode": {
+                  "type": "integer",
+                  "example": 409
+                },
+                "message": {
+                  "type": "string"
+                },
+                "error": {
+                  "type": "string",
+                  "example": "Conflict"
+                }
+              }
+            }
+          }
+        }
+      },
+      "IdempotencyMismatch": {
+        "description": "This Idempotency-Key was already used for a different request. Use a new key for a different request.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "statusCode": {
+                  "type": "integer",
+                  "example": 422
+                },
+                "message": {
+                  "type": "string"
+                },
+                "error": {
+                  "type": "string",
+                  "example": "Unprocessable Entity"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "parameters": {
+      "IdempotencyKey": {
+        "name": "Idempotency-Key",
+        "in": "header",
+        "required": false,
+        "description": "A unique value for this request, 8 to 64 characters (letters, numbers, dots, dashes, underscores, colons). Send the same value when retrying: the first answer is returned with the header `Idempotent-Replayed: true` and nothing is created twice. Kept for 24 hours. The same key with a different request returns 422; the same key while the first request is still running returns 409.",
+        "schema": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64,
+          "pattern": "^[A-Za-z0-9._:-]{8,64}$"
+        },
+        "example": "order_1001_attempt_1"
       }
     }
   }
