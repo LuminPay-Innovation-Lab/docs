@@ -32,6 +32,12 @@
     },
     {
       "name": "Invoices"
+    },
+    {
+      "name": "Payouts"
+    },
+    {
+      "name": "Refunds"
     }
   ],
   "paths": {
@@ -828,6 +834,635 @@
           }
         }
       }
+    },
+    "/payouts": {
+      "get": {
+        "tags": [
+          "Payouts"
+        ],
+        "summary": "List payouts",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Your payouts, newest first.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Payout"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request."
+          },
+          "401": {
+            "description": "Missing, invalid, expired or restricted API key or session."
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Payouts"
+        ],
+        "summary": "Request an instant payout",
+        "description": "Sends naira from your balance to your verified bank account. Omit `amountNgn` to pay out everything available. Only one payout can be in progress at a time. Large or unusual payouts can need a second approval or the owner's selfie (`403 SELFIE_REQUIRED`); an instant payout carries a fee (see `GET /payouts/rules`). Payouts go only to a bank account in your own verified name.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "amountNgn": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Whole naira. Omit to pay out the whole available balance."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The payout, now pending or awaiting approval.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Payout"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request."
+          },
+          "401": {
+            "description": "Missing, invalid, expired or restricted API key or session."
+          },
+          "403": {
+            "description": "A payout is already in progress, the balance or limits do not allow it, or the owner's selfie is needed (`SELFIE_REQUIRED`)."
+          },
+          "409": {
+            "$ref": "#/components/responses/IdempotencyConflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/IdempotencyMismatch"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/payouts/rules": {
+      "get": {
+        "tags": [
+          "Payouts"
+        ],
+        "summary": "Get payout terms",
+        "description": "When automatic payouts go out and what an instant payout costs.",
+        "responses": {
+          "200": {
+            "description": "The current rules.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PayoutRules"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request."
+          },
+          "401": {
+            "description": "Missing, invalid, expired or restricted API key or session."
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/payouts/schedule": {
+      "get": {
+        "tags": [
+          "Payouts"
+        ],
+        "summary": "Get the payout schedule",
+        "responses": {
+          "200": {
+            "description": "The schedule: `manual`, `daily` or `weekly`, and the day for weekly."
+          },
+          "400": {
+            "description": "Invalid request."
+          },
+          "401": {
+            "description": "Missing, invalid, expired or restricted API key or session."
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Payouts"
+        ],
+        "summary": "Update the payout schedule",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "schedule"
+                ],
+                "properties": {
+                  "schedule": {
+                    "type": "string",
+                    "enum": [
+                      "manual",
+                      "daily",
+                      "weekly"
+                    ]
+                  },
+                  "dayOfWeek": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 6
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The saved schedule."
+          },
+          "400": {
+            "description": "Invalid request."
+          },
+          "401": {
+            "description": "Missing, invalid, expired or restricted API key or session."
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/charges/{chargeId}/refunds": {
+      "parameters": [
+        {
+          "name": "chargeId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Refunds"
+        ],
+        "summary": "List refunds for a charge",
+        "description": "Needs a signed-in dashboard session.",
+        "responses": {
+          "200": {
+            "description": "The refunds for this charge.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Refund"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request."
+          },
+          "401": {
+            "description": "Missing, invalid, expired or restricted API key or session."
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Refunds"
+        ],
+        "summary": "Refund a payment",
+        "description": "A refund is a new payment back to the wallet that paid, in the same coin. LuminPay's fee is not refunded and LuminPay pays the network fee. The customer never receives more coins than they paid: if the rate moved 1% or less, or in the customer's favour, they get exactly the coins they paid; if the naira got more than 1% weaker, they get the naira price in coins at today's rate (fewer coins). You are debited the naira you were credited either way.\n\nRequires an owner, admin or manager signed in to the dashboard, and their PIN. Above your approval limit a second owner or admin must approve it; a business can also hold refunds before sending. Check the result in `merchantApprovalStatus`, `scheduledFor` and `status`. Get a quote first with `GET .../quote`.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "amount",
+                  "pin"
+                ],
+                "properties": {
+                  "amount": {
+                    "type": "string",
+                    "description": "Coins to refund, in the coin's smallest unit, as a string."
+                  },
+                  "pin": {
+                    "type": "string",
+                    "description": "The signed-in person's 6-digit PIN."
+                  },
+                  "expectedSendAmount": {
+                    "type": "string",
+                    "description": "The `sendAmount` from the quote you showed. If the rate moved and it would change, the request is refused with 409 `REFUND_QUOTE_CHANGED` and the new amount."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The refund. It may be pending approval or on hold, not yet sent.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Refund"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid amount, more than is left to refund, wrong PIN, or the wallet cannot receive refunds."
+          },
+          "403": {
+            "description": "Your role cannot refund."
+          },
+          "409": {
+            "description": "The rate moved since the quote (`REFUND_QUOTE_CHANGED`), or the Idempotency-Key is still in use."
+          },
+          "422": {
+            "$ref": "#/components/responses/IdempotencyMismatch"
+          },
+          "503": {
+            "description": "The exchange rate is unavailable, so the refund cannot be priced. Try again in a few minutes."
+          }
+        }
+      }
+    },
+    "/charges/{chargeId}/refunds/quote": {
+      "parameters": [
+        {
+          "name": "chargeId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Refunds"
+        ],
+        "summary": "Price a refund before confirming it",
+        "description": "Shows how many coins will be sent and why. Valid for 5 minutes. Needs a signed-in dashboard session.",
+        "parameters": [
+          {
+            "name": "amount",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Coins, in the coin's smallest unit."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The quote.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefundQuote"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request."
+          },
+          "401": {
+            "description": "Missing, invalid, expired or restricted API key or session."
+          }
+        }
+      }
+    },
+    "/charges/{chargeId}/refunds/{refundId}/approve": {
+      "parameters": [
+        {
+          "name": "chargeId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "refundId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "Refunds"
+        ],
+        "summary": "Approve a refund",
+        "description": "A second owner or admin approves a large refund with their own PIN. The person who asked cannot approve it. Needs a signed-in dashboard session.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "pin": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Done."
+          },
+          "400": {
+            "description": "The refund is not waiting, or it can no longer be stopped."
+          },
+          "403": {
+            "description": "A different owner or admin must do this."
+          },
+          "401": {
+            "description": "Missing, invalid, expired or restricted API key or session."
+          }
+        }
+      }
+    },
+    "/charges/{chargeId}/refunds/{refundId}/reject": {
+      "parameters": [
+        {
+          "name": "chargeId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "refundId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "Refunds"
+        ],
+        "summary": "Reject a refund",
+        "description": "Reject a large refund that is waiting for approval, with your own PIN. Needs a signed-in dashboard session.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "pin": {
+                    "type": "string"
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Done."
+          },
+          "400": {
+            "description": "The refund is not waiting, or it can no longer be stopped."
+          },
+          "403": {
+            "description": "A different owner or admin must do this."
+          },
+          "401": {
+            "description": "Missing, invalid, expired or restricted API key or session."
+          }
+        }
+      }
+    },
+    "/charges/{chargeId}/refunds/{refundId}/cancel": {
+      "parameters": [
+        {
+          "name": "chargeId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "refundId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "Refunds"
+        ],
+        "summary": "Cancel a refund",
+        "description": "Cancel a refund that is on hold or waiting for approval. Nothing was sent. Needs a signed-in dashboard session.",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reason": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Done."
+          },
+          "400": {
+            "description": "The refund is not waiting, or it can no longer be stopped."
+          },
+          "403": {
+            "description": "A different owner or admin must do this."
+          },
+          "401": {
+            "description": "Missing, invalid, expired or restricted API key or session."
+          }
+        }
+      }
+    },
+    "/refund-settings": {
+      "get": {
+        "tags": [
+          "Refunds"
+        ],
+        "summary": "Get refund settings",
+        "description": "Needs a signed-in dashboard session.",
+        "responses": {
+          "200": {
+            "description": "The settings.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefundSettings"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request."
+          },
+          "401": {
+            "description": "Missing, invalid, expired or restricted API key or session."
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Refunds"
+        ],
+        "summary": "Change refund settings",
+        "description": "The approval limit and the hold before sending. Owner or admin, with their PIN.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "pin"
+                ],
+                "properties": {
+                  "approvalLimitKobo": {
+                    "type": "string"
+                  },
+                  "holdMinutes": {
+                    "type": "integer",
+                    "enum": [
+                      0,
+                      15,
+                      60,
+                      240,
+                      1440
+                    ]
+                  },
+                  "pin": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The saved settings.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefundSettings"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request."
+          },
+          "401": {
+            "description": "Missing, invalid, expired or restricted API key or session."
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1295,6 +1930,255 @@
           },
           "code": {
             "type": "string"
+          }
+        }
+      },
+      "Payout": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reference": {
+            "type": "string",
+            "description": "LuminPay's unique reference for the payout."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "awaiting_approval",
+              "pending",
+              "processing",
+              "completed",
+              "failed",
+              "reversed"
+            ]
+          },
+          "destAmountNgn": {
+            "type": "string",
+            "description": "Naira sent to your bank account, for example \"49,500.00\"."
+          },
+          "feeNgn": {
+            "type": "string",
+            "description": "Fee charged for the payout (an instant payout has a fee; the automatic payout is free)."
+          },
+          "payoutType": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "PayoutRules": {
+        "type": "object",
+        "description": "Payout terms. Amounts are in naira.",
+        "properties": {
+          "dailyMinimumNgn": {
+            "type": "number",
+            "example": 5000,
+            "description": "Balance needed for the automatic daily payout."
+          },
+          "smallBalanceDay": {
+            "type": "integer",
+            "example": 5,
+            "description": "Day of the week (0 = Sunday) when smaller balances are also paid out."
+          },
+          "smallBalanceMinimumNgn": {
+            "type": "number",
+            "example": 100
+          },
+          "instantFeePercent": {
+            "type": "number",
+            "example": 1
+          },
+          "instantFeeMinNgn": {
+            "type": "number",
+            "example": 100
+          },
+          "instantFeeMaxNgn": {
+            "type": "number",
+            "example": 1000
+          },
+          "instantMinimumNgn": {
+            "type": "number",
+            "example": 1000,
+            "description": "Smallest instant payout."
+          },
+          "secondApprovalAboveNgn": {
+            "type": "number",
+            "example": 0,
+            "description": "Payouts above this need a second approval. 0 means off."
+          }
+        }
+      },
+      "Refund": {
+        "type": "object",
+        "properties": {
+          "refundId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "chargeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amount": {
+            "type": "string",
+            "description": "Coins the sale is reduced by, in the coin's smallest unit."
+          },
+          "sendAmount": {
+            "type": "string",
+            "description": "Coins actually sent. Never more than amount. Less when the naira got more than 1% weaker since the sale."
+          },
+          "asset": {
+            "type": "string"
+          },
+          "destinationAddress": {
+            "type": "string",
+            "description": "The wallet that paid. Refunds cannot go anywhere else."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "completed",
+              "failed"
+            ]
+          },
+          "merchantApprovalStatus": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "not_required",
+              "pending",
+              "approved",
+              "rejected",
+              "cancelled"
+            ],
+            "description": "`pending` means a second owner or admin must approve it."
+          },
+          "scheduledFor": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When a hold ends and the refund is sent."
+          },
+          "rateBasis": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "original",
+              "current",
+              "capped"
+            ]
+          },
+          "moveBps": {
+            "type": "integer",
+            "nullable": true,
+            "description": "How far the market rate moved against the customer since the sale, in basis points."
+          },
+          "merchantDebitKobo": {
+            "type": "string",
+            "nullable": true,
+            "description": "Naira taken from your balance, in kobo."
+          },
+          "failureReason": {
+            "type": "string",
+            "nullable": true
+          },
+          "txHash": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "RefundQuote": {
+        "type": "object",
+        "properties": {
+          "ruleApplied": {
+            "type": "boolean"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "sendAmount": {
+            "type": "string"
+          },
+          "coinsWithheld": {
+            "type": "string"
+          },
+          "basis": {
+            "type": "string",
+            "enum": [
+              "original",
+              "current",
+              "capped"
+            ]
+          },
+          "moveBps": {
+            "type": "integer"
+          },
+          "rateSale": {
+            "type": "number"
+          },
+          "rateNow": {
+            "type": "number"
+          },
+          "rateEstimated": {
+            "type": "boolean"
+          },
+          "merchantDebitKobo": {
+            "type": "string"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The quote is valid for 5 minutes."
+          },
+          "asset": {
+            "type": "string"
+          },
+          "scale": {
+            "type": "integer"
+          }
+        }
+      },
+      "RefundSettings": {
+        "type": "object",
+        "properties": {
+          "approvalLimitKobo": {
+            "type": "string",
+            "description": "Refunds above this need a second owner or admin. Default 25000000 (₦250,000)."
+          },
+          "holdMinutes": {
+            "type": "integer",
+            "enum": [
+              0,
+              15,
+              60,
+              240,
+              1440
+            ],
+            "description": "Hold before sending. 0 means send at once."
           }
         }
       }

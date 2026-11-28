@@ -27,6 +27,8 @@
             "pages": [
               "guides/payments",
               "guides/payment-links-and-invoices",
+              "guides/payouts",
+              "guides/refunds",
               "guides/webhooks",
               "guides/idempotency",
               "guides/networks",
