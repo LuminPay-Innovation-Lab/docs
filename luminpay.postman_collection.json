@@ -40,6 +40,12 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "disabled": true,
+                "description": "Optional. Send the same value when retrying so the request is not done twice. 8 to 64 characters, kept 24 hours."
               }
             ],
             "url": {
@@ -274,6 +280,12 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "disabled": true,
+                "description": "Optional. Send the same value when retrying so the request is not done twice. 8 to 64 characters, kept 24 hours."
               }
             ],
             "url": {
@@ -397,6 +409,12 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "disabled": true,
+                "description": "Optional. Send the same value when retrying so the request is not done twice. 8 to 64 characters, kept 24 hours."
               }
             ],
             "url": {
